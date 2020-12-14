@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: true
+      connection-test-query: SELECT 1
+      connection-timeout: 30000
+      idle-timeout: 30000
+      max-lifetime: 500000
+      maximum-pool-size: 15
+      minimum-idle: 5
+      pool-name: DatebookHikariCP
+    password: 123qqq...A
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://106.55.40.222:3306/gongjiao?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+
+  redis:
+    database: 0
+    host: 106.55.40.222
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+        min-idle: 0
+    password: richcomm2016
+    port: 6379
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+
+server:
+  port: 8091
+
+sellerId: 1
+userId: 1
+expireTime: 60

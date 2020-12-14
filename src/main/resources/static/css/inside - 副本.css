@@ -1,0 +1,101 @@
+
+.part_1{
+    width: 25%;
+    position: absolute;
+    transition: all 1s;
+    -webkit-transition:all 1s;
+    -moz-transition: all 1s;
+    -o-transition: all 1s; 
+}
+.part_animate{
+    left: -25%;
+}
+.part_animate_1{
+    left: 1%;
+}
+.part_3 {
+   width: 25%;
+   left: 105%;
+   position: absolute;
+   transition: all 1s;
+   -webkit-transition:all 1s;
+   -moz-transition: all 1s;
+   -o-transition: all 1s;
+}
+.part_2 {
+    width: 50%;
+    height: 980px;
+    position: absolute;
+    left: 25%;
+}
+.part_2 .line{ 
+    height: 960px;
+    width: 2px;
+    background: linear-gradient(rgba(255, 255, 255,0), rgba(0, 246, 255,1), rgba(255, 255, 255,0));
+    position: absolute;
+    top: 20px;
+    left: 3%;
+}
+.part_2 .line1{
+    height: 960px;
+    width: 2px;
+    background: linear-gradient(rgba(255, 255, 255,0), rgba(0, 246, 255,1), rgba(255, 255, 255,0));
+    position: absolute;
+    top: 20px;
+    right: -38px;
+} 
+
+
+.inside1{
+    width: 96%;
+    position: relative;
+}
+.inside2{
+    width: 45%;
+    height: 980px;
+    position: relative;
+}
+.inside3{
+    width: 43%;
+    position: relative;
+}
+.inside4,.inside5{
+    width: 43%;
+    position: relative;
+}
+
+
+.inside1>.line{
+    height: 2px;
+    width: 910px;
+    /* background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%,rgba(0, 246, 255,0.6) 50%,rgba(255, 255, 255, 0) 100%); */
+    position: absolute;
+    top: 330px;
+    left: -24px;
+    background: url('../img/horizontal-line.png');
+    background-size: 100% 100%;
+}
+
+.device_information>div{
+    width: 46%;
+}
+
+
+
+
+
+
+
+
+
+/* -----------        ------------ */
+
+/* -----------鍥剧墖鍔ㄧ敾------------ */
+
+
+.animate_center{
+    float: left;
+    margin-right: 16px;
+    width: 72px;
+    height: 72px;
+}
