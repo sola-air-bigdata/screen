@@ -62,7 +62,6 @@ public class ScreenController {
     public Gun test(){
 
         Gun gun = jdbcTemplate1.queryForObject("select * from t_gun where id = 455", Gun.class);
-
         return gun;
     }
 
