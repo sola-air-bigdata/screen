@@ -10,6 +10,9 @@ import com.nzkj.screen.Entity.DTO.StationDto;
 
 import com.nzkj.screen.Utils.StringUtils;
 import com.nzkj.screen.mapper.pile.bill.IBillMapper;
+import com.nzkj.screen.mapper.pile.config.IGunMapper;
+import com.nzkj.screen.mapper.pile.config.IPileMapper;
+import com.nzkj.screen.mapper.pile.config.IStationMapper;
 import com.xiaoleilu.hutool.util.CollectionUtil;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -51,18 +55,25 @@ public class ScreenController {
     @Value("${expireTime}")
     private int expireTime;
 
+
     @Autowired
-    private IBillMapper billMapper;
+    private IStationMapper stationMapper;
 
 
 
     @RequestMapping(value = "/test",method = RequestMethod.GET)
     public void test(){
 
-        Bill b = billMapper.get(1l);
+
+
+//        List<BigInteger> o = stationMapper.findIdBySellerId(BigInteger.valueOf(20));
+//        Set<Long> l = stationMapper.findIdBySeller(20l);
+        Object b = stationMapper.getStationDatanum(399l,20l);
+
+
+//        System.out.println(o);
+//        System.out.println(l);
         System.out.println(b);
-
-
     }
 
 

@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 
-/** @Description TODO @Author gdq @Date 2020/7/31 13:49 @Version 1.0 */
 @Repository
 public interface IBillMapper extends BaseMapper<Bill> {
 
