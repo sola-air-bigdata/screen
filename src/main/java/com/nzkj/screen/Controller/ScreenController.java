@@ -3,16 +3,18 @@ package com.nzkj.screen.Controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.nzkj.screen.Entity.Bill;
+import com.nzkj.screen.Entity.*;
 import com.nzkj.screen.Entity.DTO.GunMonitorDto;
 import com.nzkj.screen.Entity.DTO.GunStateEnum;
 import com.nzkj.screen.Entity.DTO.StationDto;
 
+import com.nzkj.screen.Entity.DTO.StationShowTotalDTO;
 import com.nzkj.screen.Utils.StringUtils;
 import com.nzkj.screen.mapper.pile.bill.IBillMapper;
 import com.nzkj.screen.mapper.pile.config.IGunMapper;
 import com.nzkj.screen.mapper.pile.config.IPileMapper;
 import com.nzkj.screen.mapper.pile.config.IStationMapper;
+import com.nzkj.screen.mapper.pile.screen.*;
 import com.xiaoleilu.hutool.util.CollectionUtil;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,11 @@ public class ScreenController {
 
 
     @Autowired
-    private IStationMapper stationMapper;
+    private IStationShowDayMapper stationShowDayMapper;
+
+    @Autowired
+    private IStationShowTotalMapper stationShowTotalMapper;
+
 
 
 
@@ -68,12 +74,16 @@ public class ScreenController {
 
 //        List<BigInteger> o = stationMapper.findIdBySellerId(BigInteger.valueOf(20));
 //        Set<Long> l = stationMapper.findIdBySeller(20l);
-        Object b = stationMapper.getStationDatanum(399l,20l);
-
+//        Object b = stationMapper.getStationDatanum(399l,20l);
+//        AllDayData b = allDayMapper.getUserActivityList(1l,"2020-09-28");
+//        List<AllDayMember> d = allDayMemberMapper.getdayTransIncomeRank(23l,1181l,"2020-06-28");
+//        StationShowDay a = stationShowDayMapper.get(52l,11l,"2018-10-31");
+        List<StationShowTotalDTO> a = stationShowTotalMapper.getTop3(21l,"2020-01");
 
 //        System.out.println(o);
 //        System.out.println(l);
-        System.out.println(b);
+//        System.out.println(b);
+        System.out.println(a);
     }
 
 
