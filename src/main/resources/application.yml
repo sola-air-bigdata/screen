@@ -75,6 +75,6 @@ spring:
 server:
   port: 8091
 
-sellerId: 1
+sellerId: 21
 userId: 1
 expireTime: 60

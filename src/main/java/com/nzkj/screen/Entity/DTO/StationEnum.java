@@ -47,17 +47,17 @@ public enum StationEnum {
 		return maps;
 	}
 
-	public final static StationEnum getEnumByName(String name){
+	public final static StationEnum getEnumByName(int name){
 		
-		if("开启".equals(name)){
+		if(name == 1){
 			return StationEnum.KaiQi;
-		}else if("关闭".equals(name)){
+		}else if(name == 2){
 			return StationEnum.GuanBi;
-		}else if("未知".equals(name)){
+		}else if(name == 3){
 			return StationEnum.WeiZhi;
-		}else if("建设中".equals(name)){
+		}else if(name == 4){
 			return StationEnum.JianShenZhong;
-		}else if("维护中".equals(name)){
+		}else if(name == 5){
 			return StationEnum.WeiHuZhong;
 		}
 		return null;

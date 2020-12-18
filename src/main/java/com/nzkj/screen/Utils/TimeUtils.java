@@ -70,6 +70,17 @@ public class TimeUtils {
 	}
 
 	/**
+	 * 格式化年月
+	 * @param date
+	 * @return
+	 */
+	public static String formatYearAndMonth(Date date){
+		return format(date,"yyyy-MM");
+	}
+
+
+
+	/**
 	 * n天前或后 + -
 	 *
 	 * @param date

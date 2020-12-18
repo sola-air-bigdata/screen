@@ -5,8 +5,10 @@ import com.nzkj.screen.Entity.AllDayData;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -30,6 +32,8 @@ public interface IAllDayMapper extends BaseMapper<AllDayData> {
     AllDayData getUserActivityList(@Param("sellerId") Long l_seller_id, @Param("date") String date);
 
 
+    @Select("SELECT day_i_actual_balance_balance_nteam  from t_all_day_table WHERE l_seller_id = #{id} AND d_day_time = #{date} ")
+    BigInteger getTotalTransIncome(@Param("id") Long l_seller_id, @Param("date") String date);
 
 
 
