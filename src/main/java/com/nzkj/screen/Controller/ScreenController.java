@@ -55,15 +55,15 @@ public class ScreenController {
     @Autowired
     private ScreenRedisService screenRedisService;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate1;
-
-    @RequestMapping(value = "/test",method = RequestMethod.GET)
-    public Gun test(){
-
-        Gun gun = jdbcTemplate1.queryForObject("select * from t_gun where id = 455", Gun.class);
-        return gun;
-    }
+//    @Autowired
+//    JdbcTemplate jdbcTemplate1;
+//
+//    @RequestMapping(value = "/test",method = RequestMethod.GET)
+//    public Gun test(){
+//
+//        Gun gun = jdbcTemplate1.queryForObject("select * from t_gun where id = 455", Gun.class);
+//        return gun;
+//    }
 
 
     /*
@@ -77,7 +77,7 @@ public class ScreenController {
      * @return map key : monthServicesNums(月总服务次数) monthTotalPower(总电量)
      * monthTotalRevenue(总收入统计)
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationSumInfoByID.json",method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationSumInfoByID.json",method = RequestMethod.POST)
     public Map<String, Object> doGetStationSumInfoByID(@Param("stationID") Long stationID, @Param("month") Date date) {
         return screenRedisService.doGetStationSumInfoByID(stationID,date);
     }
@@ -93,9 +93,9 @@ public class ScreenController {
      * @return key:gunCount 枪总数 charging 充电中的枪 free 空闲中的枪 chargePrepare 充电准备中的枪
      * chargeFinsh 充电完成中的枪 offLine 离线中的枪 problem 故障中的枪 bespeak 预约中的枪
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationSumViewData.json",method = RequestMethod.GET)
-    public Map<String, Object> doGetStationSumViewData(@Param("stationId") Long stationId){
-        return screenRedisService.doGetStationSumViewData(stationId);
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationSumViewData.json",method = RequestMethod.POST)
+    public Map<String, Object> doGetStationSumViewData(@Param("stationID") Long stationID){
+        return screenRedisService.doGetStationSumViewData(stationID);
     }
 
     /*
@@ -107,7 +107,7 @@ public class ScreenController {
      *
      * @return map key : carNums(服务的车辆数) date(日期) charingBalance(收入)
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationCarServiceTime.json",method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationCarServiceTime.json",method = RequestMethod.POST)
     public Map<String, Object> doGetStationCarServiceTime(@Param("stationID") Long stationID) {
         Map<String, Object> result = new ConcurrentHashMap<>();
         List<Map<String, Object>> carSumData = screenRedisService.getCarSumData(stationID);
@@ -144,13 +144,13 @@ public class ScreenController {
      * @return key:pileName桩名称 pileID 桩ID gunJson 枪列表（List） soc soc值 remainTime 剩余时间
      * current 充电电流 pileName 桩名称 gunNo枪号 gunState枪状态 power已冲电量
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getGunData.json",method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getGunData.json",method = RequestMethod.POST)
     public List<Object> doGetGunData(@Param("stationID") Long stationID){
         return screenRedisService.doGetGunData(stationID);
     }
 
 
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getSelloNoAndAccount.json",method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getSelloNoAndAccount.json",method = RequestMethod.POST)
     public Map<String, Object> doGetSelloNoAndAccount() {
         Map<String, Object> result = new ConcurrentHashMap<>();
         result.put("sellerNo", sellerId);

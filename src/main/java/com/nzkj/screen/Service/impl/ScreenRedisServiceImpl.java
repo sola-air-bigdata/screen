@@ -93,7 +93,7 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
     @Override
     public Map<String, Object> doGetStationSumViewData(Long stationId) {
         Map<String, Object> retMap = new ConcurrentHashMap<String, Object>();
-//        try {
+        try {
             int gunCount = 0;// 枪总数
             int charging = 0;// 充电中的枪
             int free = 0;// 空闲中的枪
@@ -154,10 +154,10 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
             retMap.put("offLine", offLine);
             retMap.put("problem", problem);
             retMap.put("bespeak", bespeak);
-//        } catch (Exception e) {
-//            retMap.put("code", "1");
-//
-//        }
+        } catch (Exception e) {
+            retMap.put("code", "1");
+
+        }
         return retMap;
     }
 

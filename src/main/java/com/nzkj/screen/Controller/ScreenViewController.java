@@ -805,24 +805,7 @@ public class ScreenViewController {
     @RequestMapping(value = "/test",method = RequestMethod.POST)
     public JSONArray getStation(){
 
-//        JSONArray stationDtos = new JSONArray();
-//        String stationInfoUnderSellerId = String.format("AT_%s_%s", sellerId, "station_info_under_sellerId");
-//        if(redisTemplate.opsForValue().get(stationInfoUnderSellerId) != null){
-//            stationDtos = (JSONArray) redisTemplate.opsForValue().get(stationInfoUnderSellerId);
-//            System.out.println("从redis里获取哒");
-//        }else {
-//            List<Station> stationBySeller = stationRepository.findBySellIdAndDeleteFlag(BigInteger.valueOf(sellerId),false);
-//            for(Station station :stationBySeller){
-//                JSONObject stationDto = new JSONObject();
-//                stationDto.put("stationId",station.getId());
-//                stationDto.put("stationName",station.getName());
-//                stationDto.put("lng",station.getLongitude());
-//                stationDto.put("lat",station.getLatitude());
-//                stationDtos.add(stationDto);
-//            }
-//            redisTemplate.opsForValue().set(stationInfoUnderSellerId,stationDtos,120,TimeUnit.SECONDS);
-//            System.out.println("从数据库获取并存入了redis");
-//        }
+
 
         return null;
 
@@ -913,7 +896,7 @@ public class ScreenViewController {
      * @param stationID
      * @return
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getRealtimePower.json",method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getRealtimePower.json",method = RequestMethod.POST)
     public Map<String, Object> doGetRealtimePower(Long stationID) {
         Map<String, Object> result = new ConcurrentHashMap<>();
         float realTimePower = 0;// 实时功率

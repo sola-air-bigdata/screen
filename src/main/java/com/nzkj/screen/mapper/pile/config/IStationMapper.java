@@ -1,6 +1,7 @@
 package com.nzkj.screen.mapper.pile.config;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.nzkj.screen.Entity.DTO.StationDto;
 import com.nzkj.screen.Entity.DTO.StationInfoDTO;
 import com.nzkj.screen.Entity.Station;
 import org.apache.ibatis.annotations.Select;
@@ -55,6 +56,10 @@ public interface IStationMapper extends BaseMapper<Station> {
 
     @Select("select * from t_station where seller_id = #{sellerId} and deleted = 0 ")
     List<Station> findBySeller(@Param("sellerId") long sellerId);
+
+//    @Select("select * from t_station where seller_id = #{sellerId} and deleted = 0 ")
+//    List<StationDto> findDTOBySeller(@Param("sellerId") long sellerId);
+
 
 
     /**

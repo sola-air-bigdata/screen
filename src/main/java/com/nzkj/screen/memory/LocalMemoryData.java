@@ -2,16 +2,15 @@ package com.nzkj.screen.memory;
 
 
 
-import com.nzkj.screen.Entity.DTO.AreaDto;
-import com.nzkj.screen.Entity.DTO.GunMonitorDto;
+import com.nzkj.screen.Entity.DTO.*;
 
-import com.nzkj.screen.Entity.DTO.PileDto;
-import com.nzkj.screen.Entity.DTO.StationDto;
+import com.nzkj.screen.Entity.Station;
 import com.nzkj.screen.mapper.pile.config.IGunMapper;
 import com.nzkj.screen.mapper.pile.config.IPileMapper;
 import com.nzkj.screen.mapper.pile.config.IStationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.*;
@@ -25,6 +24,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @SuppressWarnings({"unchecked","rawtypes"})
@@ -60,6 +60,13 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 	@Autowired
 	private IGunMapper gunMapper;
 
+	@Value("${expireTime}")
+	private int expireTime;
+
+	//商家id为固定值
+	@Value("${sellerId}")
+	private long sellerId;
+
 
 //	@Autowired
 //	private PileHeartBeat pileHeartBeat;
@@ -69,11 +76,16 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 	@PostConstruct
 	public void initData(){
 		//在spring容器初始化后自动调用一次  初始化这些数组的数据
-		loadData(1l);
+		loadData(sellerId);
 	}
 
 	@Override
 	public List<StationDto> getStationBySeller(Long sellerId) {
+		String key = "StationUpdateParameter"+sellerId;
+		if(redisJsonTemplate.opsForValue().get(key)== null){
+			updateStation(sellerId);
+			redisJsonTemplate.opsForValue().set(key,"当这个key失效，就更新一次sellerId下的station",expireTime*3, TimeUnit.SECONDS);
+		}
 		Set<Long> stationIds = sellerStationMap.get(sellerId);
 		if(CollectionUtil.isEmpty(stationIds)) {
 			return Collections.emptyList();
@@ -91,10 +103,29 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		return stationMap.get(stationId);
 	}
 
-	private void updateStation(Set<Long> stationIds){
-		for(Long stationId :stationIds){
-
+	private void updateStation(Long sellerId){
+		List<Station> stations = stationMapper.findBySeller(sellerId);
+		Set<Long> stationIds = null;
+		for(Station s : stations){
+			StationDto dto = new StationDto();
+			dto.setId(s.getId());
+			dto.setAreaid(s.getAreaId());
+			dto.setConfigTypeEnum(s.getConfigType());
+			dto.setAbbreviationName(s.getAbbreviationName());
+			dto.setClosetimeAm(s.getCloseTimeAm());
+			dto.setCloseTimePm(s.getCloseTimePm());
+			dto.setImagePath(s.getImagePath());
+			dto.setImg1(s.getImg1());
+			dto.setImg2(s.getImg2());
+			dto.setImg3(s.getImg3());
+			dto.setFastSlow(StationFastSlowEnum.getEnumByName(s.getFastSlow()));
+			dto.setLongitude(s.getLongitude());
+			dto.setLatitude(s.getLatitude());
+			dto.setScore(s.getScore());
+			stationMap.put(s.getId(),dto);
+			stationIds.add(s.getId());
 		}
+		sellerStationMap.put(sellerId,stationIds);
 	}
 
 	@Override
@@ -218,15 +249,23 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		//先从数据库查出所有 gunId 并且对应的pileId stationId  一些废弃的gun也可能被添加进去？？
 	}
 
+//	private void initRedisData(Long seller){
+//		Set<Long> stationIds = sellerStationMap.get(seller);
+//		for(Long stationId : stationIds){
+//
+//		}
+//	}
+
 	@Override
 	public List<GunMonitorDto> getGunByStation(Long stationId) {
+		Set<String> gunKeys = null;
 		Set<Long> piles = stationPileMap.get(stationId);
 		if(CollectionUtil.isEmpty(piles)) {
 			return Collections.emptyList();
 		}
 		final List<String> keys = new ArrayList<>();
 
-		Set<String> gunKeys = null;
+
 		for(Long pileId : piles) {
 			gunKeys = pileGunMap.get(pileId);
 			if(CollectionUtil.isNotEmpty(gunKeys)) {
@@ -236,24 +275,24 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		if(keys.size() == 0) {
 			return Collections.emptyList();
 		}
-		return redisJsonTemplate.executePipelined((RedisCallback<GunMonitorDto>) conn -> {
-			conn.openPipeline();
-			for(int i = 0, size = keys.size(); i < size; i++) {
-				conn.get(keys.get(i).getBytes());
-			}
-			return null;
-		},redisJsonTemplate.getValueSerializer());
-
-//		return redisJsonTemplate.executePipelined(new SessionCallback<GunMonitorDto>() {
-//
-//			@Override
-//			public GunMonitorDto execute(RedisOperations operations) throws DataAccessException {
-//				for(int i = 0, size = keys.size(); i < size; i++) {
-//					operations.opsForValue().get(keys.get(i));
-//				}
-//				return null;
+//		return redisJsonTemplate.executePipelined((RedisCallback<GunMonitorDto>) conn -> {
+//			conn.openPipeline();
+//			for(int i = 0, size = keys.size(); i < size; i++) {
+//				conn.get(keys.get(i).getBytes());
 //			}
-//		});
+//			return null;
+//		},redisJsonTemplate.getValueSerializer());
+
+		return redisJsonTemplate.executePipelined(new RedisCallback<GunMonitorDto>() {
+			@Override
+			public GunMonitorDto doInRedis(RedisConnection conn) throws DataAccessException {
+				conn.openPipeline();
+				for(int i = 0, size = keys.size(); i < size; i++) {
+					conn.get(keys.get(i).getBytes());
+				}
+				return null;
+			}
+		},redisJsonTemplate.getValueSerializer());
 	}
 
 
