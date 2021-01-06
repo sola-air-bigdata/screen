@@ -36,48 +36,48 @@ $(function() {
 	 * 定时器
 	 * 
 	 */
-//	var timer1 = setTimeout(FiveSec, 6000); //5秒钟执行一次
-//	function FiveSec() {
-//		getRealPower(); //执行方法
-//		clearTimeout(timer1);
-//		setTimeout(FiveSec, 6000)
-//	};
+	var timer1 = setTimeout(FiveSec, 2000); //5秒钟执行一次
+	function FiveSec() {
+		getRealPower(); //执行方法
+		clearTimeout(timer1);
+		setTimeout(FiveSec, 2000)
+	};
 
-	var timer2 = setTimeout(TreeSec1, 30000); //30秒执行一次
+	var timer2 = setTimeout(TreeSec1, 2000); //30秒执行一次
 	function TreeSec1() {
 		getTotalNum(); //数字滚动部分数据  累计 收入 服务  30秒刷新 一次
 		clearTimeout(timer2);
-		setTimeout(TreeSec1, 30000)
+		setTimeout(TreeSec1, 2000)
 	}
 
-	var timer2_1 = setTimeout(TreeSec2, 35000); //30秒执行一次
+	var timer2_1 = setTimeout(TreeSec2, 2000); //30秒执行一次
 	function TreeSec2() {
 		incomeWayData(); //收入方式统计  30秒刷新 一次  右下角
 		serviceOperateData(); //累计服务时长 30秒刷新 一次
 		clearTimeout(timer2_1);
-		setTimeout(TreeSec2, 35000)
+		setTimeout(TreeSec2, 2000)
 	}
 
-	var timer3_1 = setTimeout(OneMin1, 60000); //1分钟执行一次
+	var timer3_1 = setTimeout(OneMin1, 2000); //1分钟执行一次
 	function OneMin1() {
 		getAllPowerAndCarCharging(); //总功率 一分钟刷新一次
 		getStationServiceRanking(); //站点服务频率排行 一分钟刷新一次
 		clearTimeout(timer3_1);
-		setTimeout(OneMin1, 60000)
+		setTimeout(OneMin1, 2000)
 	}
 
-	var timer3_2 = setTimeout(OneMin2, 65000); //1分钟执行一次
+	var timer3_2 = setTimeout(OneMin2, 2000); //1分钟执行一次
 	function OneMin2() {
 		historyTotalCharging(); //累计充电量部分的数据 一分钟刷新一次
 		clearTimeout(timer3_2);
-		setTimeout(OneMin2, 65000)
+		setTimeout(OneMin2, 2000)
 	}
 
-	var timer3_3 = setTimeout(OneMin3, 65000); //1分钟执行一次
+	var timer3_3 = setTimeout(OneMin3, 2000); //1分钟执行一次
 	function OneMin3() {
 		deviceProblemData(); //设备故障率部分  一分钟刷新一次
 		clearTimeout(timer3_3);
-		setTimeout(OneMin3, 70000)
+		setTimeout(OneMin3, 2000)
 	}
 
 	var allPower_f = 0;

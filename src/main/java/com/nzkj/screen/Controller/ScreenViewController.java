@@ -144,15 +144,15 @@ public class ScreenViewController {
     @RequestMapping(value = "/statistic/screenNewAjax/getAllPowerAndCarCharging.json" ,method = RequestMethod.POST)
     public Map<String, Object> getAllPowerAndCarCharging(){
         Map<String, Object> map = new ConcurrentHashMap<String, Object>();
-        String key = String.format("AT_%s_%s", sellerId, "total_equipment_power");
-        Object all = redisTemplate.opsForValue().get(key);
-        if (all == null){
+//        String key = String.format("AT_%s_%s", sellerId, "total_equipment_power");
+//        Object all = redisTemplate.opsForValue().get(key);
+//        if (all == null){
         BigInteger allPower = totalOperateMapper.get(sellerId).getTotalEquipmentPower();
-        redisTemplate.opsForValue().set(key,allPower,expireTime,TimeUnit.SECONDS);
+//        redisTemplate.opsForValue().set(key,allPower,expireTime,TimeUnit.SECONDS);
         map.put("allPower",allPower);
-        }else {
-            map.put("allPower", all);
-        }
+//        }else {
+//            map.put("allPower", all);
+//        }
         return map;
     }
 
@@ -635,28 +635,30 @@ public class ScreenViewController {
     public Map<String, Object> doGetRealPower(){
         Map<String, Object> map = new ConcurrentHashMap<String, Object>();
         //获取总功率
-        String key = String.format("AT_%s_%s", sellerId, "total_equipment_power");
-        double allPower = (double)redisTemplate.opsForValue().get(key);
-        if(allPower == 0){
-            allPower = totalOperateMapper.get(sellerId).getTotalEquipmentPower().longValue();
-        }
+//        String key = String.format("AT_%s_%s", sellerId, "total_equipment_power");
+//        double allPower = (double)redisTemplate.opsForValue().get(key);
+//        if(allPower == 0){
+        double allPower = totalOperateMapper.get(sellerId).getTotalEquipmentPower().longValue();
+//        }
 
         //获取实时功率
-        double realTimePower = (double) redisTemplate.opsForValue().get("countPower");
+        int realTimePower =  (int)redisTemplate.opsForValue().get("powerSum-"+sellerId);
+        int gunCount = (int)redisTemplate.opsForValue().get("gunCount-"+sellerId);
         map.put("realTimePower", AmountUtils.div(realTimePower, 1000,0));//单位千瓦
         //显示当前充电电桩的百分比值chargingPercent
         BigDecimal num=new BigDecimal(AmountUtils.div(realTimePower, 1000,3)).divide(new BigDecimal(String.valueOf(allPower)),4, BigDecimal.ROUND_HALF_UP);
         num=num.multiply(new BigDecimal(100)).setScale(2);
         map.put("chargingPercent", num);
         //离线率offLinePercent
-        BigDecimal offLinePercent=new BigDecimal(String.valueOf(redisTemplate.opsForValue().get("offlineRate")));
+
+        BigDecimal offLinePercent=new BigDecimal(String.valueOf(redisTemplate.opsForValue().get("offlineCount-"+sellerId))).divide(new BigDecimal(String.valueOf(redisTemplate.opsForValue().get("gunCount-"+sellerId))),4, BigDecimal.ROUND_HALF_UP);
         offLinePercent=offLinePercent.multiply(new BigDecimal(100)).setScale(2);
         map.put("offLinePercent", offLinePercent);
         //当前故障数
-        int problemCount = (int)redisTemplate.opsForValue().get("wrongCount");
+        int problemCount = (int)redisTemplate.opsForValue().get("problemCount-"+sellerId);
         map.put("problemCount", problemCount);
         //故障率problemPercent
-        BigDecimal problemPercent=new BigDecimal(String.valueOf(problemCount)).divide(new BigDecimal(String.valueOf(redisTemplate.opsForValue().get("countNum"))),4, BigDecimal.ROUND_HALF_UP);
+        BigDecimal problemPercent=new BigDecimal(String.valueOf(problemCount)).divide(new BigDecimal(String.valueOf(redisTemplate.opsForValue().get("gunCount-"+sellerId))),4, BigDecimal.ROUND_HALF_UP);
         problemPercent=problemPercent.multiply(new BigDecimal(100)).setScale(2);
         map.put("problemPercent", problemPercent);
 

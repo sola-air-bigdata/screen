@@ -1,22 +1,22 @@
-var timer4_1 = setTimeout(FiveSec1, 15000); //15秒钟执行一次
+var timer4_1 = setTimeout(FiveSec1, 2000); //15秒钟执行一次
 function FiveSec1() {
 	GetTransBalance(); //执行方法
 	clearTimeout(timer4_1);
-	setTimeout(FiveSec1, 15000)
+	setTimeout(FiveSec1, 2000)
 };
 
-var timer4_2 = setTimeout(FiveSec2, 18000); //15秒钟执行一次
+var timer4_2 = setTimeout(FiveSec2, 2000); //15秒钟执行一次
 function FiveSec2() {
 	GetTransIncomeRank(); //执行方法
 	clearTimeout(timer4_2);
 	setTimeout(FiveSec2, 18000)
 };
 
-var timer4_3 = setTimeout(FiveSec3, 13000); //15秒钟执行一次
+var timer4_3 = setTimeout(FiveSec3, 2000); //15秒钟执行一次
 function FiveSec3() {
 	IncomeWayData(); //执行方法
 	clearTimeout(timer4_3);
-	setTimeout(FiveSec3, 13000);
+	setTimeout(FiveSec3, 2000);
 };
 
 GetTransBalance(); // 首页 收入总览数据

@@ -306,8 +306,10 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 					}
 				});
 				if (results != null && !results.isEmpty()) {
+
 					for (int j = 0; j < results.size(); j++) {
 						String monitorvalue = (String) results.get(j);
+						gunCount++;
 						if (monitorvalue != null) {
 //							GunMonitorDto monitorDto = (GunMonitorDto) JSONObject.parse(monitorvalue);
 							JSONObject o = (JSONObject) JSONObject.parse(monitorvalue);
@@ -365,16 +367,9 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		redisJsonTemplate.opsForValue().set("chargePrepareCount-"+sellerId,chargePrepare);
 		redisJsonTemplate.opsForValue().set("bespeakCount-"+sellerId,bespeak);
 		redisJsonTemplate.opsForValue().set("problemCount-"+sellerId,problem);
-
+		redisJsonTemplate.opsForValue().set("gunCount-"+sellerId,gunCount);
 
 	}
-
-//	private void initRedisData(Long seller){
-//		Set<Long> stationIds = sellerStationMap.get(seller);
-//		for(Long stationId : stationIds){
-//
-//		}
-//	}
 
 	@Override
 	public List<GunMonitorDto> getGunByStation(Long stationId) {
