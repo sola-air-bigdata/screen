@@ -5,7 +5,7 @@ package com.nzkj.screen.memory;
  * @date 2017-12-27
  */
 public enum RedisDataEnum {
-	APP_TOKEN("appToken","app令牌"), 
+	APP_TOKEN("appToken","app令牌"),
 	APP_TOKEN_MAP("appTokenMap","app令牌"),
 	MAIN_APP_TOKEN("mainAppToken","运维小程序令牌"),
 	MAIN_APP_TOKEN_MAP("mainAppTokenMap","运维小程序令牌"),
@@ -13,14 +13,22 @@ public enum RedisDataEnum {
 	Operator_APP_TOKEN_ID_MAP("OperatorAppTokenMap","运营小程序令牌map"),
 	CHARGEMAN_APP_TOKEN("ChargeManAppToken","充电工小程序令牌"),
 	CHARGEMAN_APP_TOKEN_MAP("ChargeManAppTokenMap","充电工小程序令牌"),
-	GUN("gun","枪"),PILE("pile","桩"),
-	STATION("station","站点"), 
-	AREA("area","区域"), 
+	GUNMONITOR("gunMonitor","枪实时温数据"),
+	GUNMONITORMINOR("gunMonitorMinor","枪实时冷数据"),
+	GUNMONITOR_PILEID_GUNNO("gunMonitorPileIdGunNo","枪实时温数据充电桩id枪编号集合"),
+	GUNMONITOR_PILEID("gunMonitorPileId","实时温数据充电桩ID集合"),
+	GUNMONITOR_GUNNO("gunMonitorNo","实时温数据充电枪编号集合"),
+	GUNMONITORMINOR_PILEID_GUNNO("gunMonitorMinorPileidGunNo","枪实时冷数据充电桩id枪编号集合"),
+	GUNMONITORMINOR_GUNNO("gunMonitorMinorNo","实时冷数据枪编号集合"),
+	CHARGE_MONITOR("chargeMonitor","充电服务监控") ,
+	GUNMINORGUNNO("gunminorGunno","冷数据充电枪编号集合"),
+	PILE("pile","桩"),
+	STATION("station","站点"),
+	AREA("area","区域"),
 	ALRM("alarm","告警"),
 	GUN_PRICE("gunPrice","枪价格"),
 	JD_BILL_RULE_DO("jdBillRuleDO","聚电计费规则DO") ,
-	CHARGE_MONITOR("chargeMonitor","充电服务监控") ,
-	PILE_AND_BILL("pileAndBill","桩与账单关系") , 
+	PILE_AND_BILL("pileAndBill","桩与账单关系") ,
 	MEMBER_AND_BILL("memberAndBill","会员与账单关系") ,
 	BUS_EXCEPTION_LOG("busExceptionLog","业务异常日志"),
 	GDEV_SELLER_TOKEN("GDEVToken","广东省电动汽车充电设施智能服务平台令牌"),
@@ -111,12 +119,18 @@ public enum RedisDataEnum {
 	KUAIDIAN_REQUEST_TOKEN("kuaidianRequestToken","快电科技平台token:用于请求"),
 	KUAIDIAN_PUSH_QUEUE("kuaidianPushQueue","快电科技平台推送队列"),
 	KUAI_DIAN_LOCK("kuaiDianLock","快电抢锁:限制重复鉴权"),
-	KUAI_DIAN_BILL("kuaiDianBill","快电账单");
-	/*CONNECTOR_BY_ORDER("connectorIdByOrder","公交数据根据订单获取ConnectorId")*/
-	
+	GUNKEYSCACHE("gunKeys","站点id集合"),
+	KUAI_DIAN_BILL("kuaiDianBill","快电账单"),
+	PILE_WARN_THRESHOLD("pileWarnThreshold","告警阀值"),
+	HAINAN_REQUEST_TOKEN("haiNanRequestToken","海南省监管平台token:用于请求"),
+	HAINAN_PUSH_TOKEN("haiNanPushToken","海南省监管平台token:用于推送"),
+	HAINAN_SELLER_SEQ("haiNanSellerSeq","海南省监管平台序列"),
+	HAINAN_PUSH_QUEUE("interFlowPushQueue","海南省监管平台推送队列"),;
+
+
 	private String prefix;
 	private String description;
-	
+
 	private RedisDataEnum(String prefix, String description) {
 		this.description = description;
 		this.prefix = prefix;
@@ -133,5 +147,5 @@ public enum RedisDataEnum {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 }

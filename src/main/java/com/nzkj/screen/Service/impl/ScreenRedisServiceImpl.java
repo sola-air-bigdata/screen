@@ -107,40 +107,40 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
                 for (GunMonitorDto gunMonitorDto : guns) {
                     gunCount++;
                     // 充电枪信息统计
-                    switch (gunMonitorDto.getGunState()) {
-                        case CHARGING:
-                            // 充电中的电枪
-                            charging++;
-                            break;
-
-                        case FREE:
-                            // 空闲中的电枪
-                            free++;
-                            break;
-
-                        case CHARGEFINISH:
-                            // 已充满的枪
-                            chargeFinsh++;
-                            break;
-                        case OFFLINE:
-                            // 离线中的电枪
-                            offLine++;
-                            break;
-                        case CHARGEPREPARE:
-                            // 充电准备中的电枪
-                            chargePrepare++;
-                            break;
-                        case BESPEAK:
-                            // 预约的电枪
-                            bespeak++;
-                            break;
-                        case Problem:
-                            // 告警中的电枪
-                            problem++;
-                            break;
-                        default:
-                            break;
-                    }
+//                    switch (gunMonitorDto.getGunState()) {
+//                        case CHARGING:
+//                            // 充电中的电枪
+//                            charging++;
+//                            break;
+//
+//                        case FREE:
+//                            // 空闲中的电枪
+//                            free++;
+//                            break;
+//
+//                        case CHARGEFINISH:
+//                            // 已充满的枪
+//                            chargeFinsh++;
+//                            break;
+//                        case OFFLINE:
+//                            // 离线中的电枪
+//                            offLine++;
+//                            break;
+//                        case CHARGEPREPARE:
+//                            // 充电准备中的电枪
+//                            chargePrepare++;
+//                            break;
+//                        case BESPEAK:
+//                            // 预约的电枪
+//                            bespeak++;
+//                            break;
+//                        case Problem:
+//                            // 告警中的电枪
+//                            problem++;
+//                            break;
+//                        default:
+//                            break;
+//                    }
 
                 }
             }
@@ -262,7 +262,8 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
                 gunJson.put("soc", val(gunMonitorDto.getSoc()));
                 gunJson.put("remainTime", val(gunMonitorDto.getRemainTime()));
                 gunJson.put("current", val(gunMonitorDto.getCurrent()/1000));
-                gunJson.put("pileName", val(gunMonitorDto.getPileDto().getName()));
+//todo                gunJson.put("pileName", val(gunMonitorDto.getPileDto().getName()));
+                gunJson.put("pileName", val(gunMonitorDto.getPileNo()));
                 gunJson.put("gunNo", val(gunMonitorDto.getGunNo()));
                 gunJson.put("gunState", val(gunMonitorDto.getGunState()));
                 gunJson.put("power", val(ParseUtils.whParseKwh(Long.valueOf(gunMonitorDto.getPower()))));
@@ -396,8 +397,8 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
             if(!org.springframework.util.CollectionUtils.isEmpty(gunByStation)) {
                 int inServiceUsers = 0;
                 for(GunMonitorDto gun : gunByStation) {
-                    if(gun.getGunState() == GunStateEnum.CHARGING && com.nzkj.screen.Utils.StringUtils.isNotEmpty(gun.getMemberNo()))memberNoSet.add(gun.getMemberNo());
-                    else if(gun.getGunState() == GunStateEnum.CHARGING)inServiceUsers++;
+                    if(gun.getGunState() == 3 && com.nzkj.screen.Utils.StringUtils.isNotEmpty(gun.getMemberNo()))memberNoSet.add(gun.getMemberNo());
+                    else if(gun.getGunState() == 3)inServiceUsers++;
                 }
                 stationJson = new JSONObject();
                 stationJson.put("stationId", station.get("stationId"));

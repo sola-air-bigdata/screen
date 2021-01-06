@@ -827,7 +827,7 @@ public class ScreenViewController {
         List<GunMonitorDto> guns = localMemoryData.getGunBySeller(sellerId);
         if(CollectionUtil.isNotEmpty(guns)) {
             for(GunMonitorDto gun : guns) {
-                if(PileUtil.isInterflow(gun.getPileDto()) || gun.getGunState() != GunStateEnum.CHARGING) {
+                if(gun.getGunState() != 3) {
                     continue;
                 }
                 //用户多充算一个
@@ -901,14 +901,11 @@ public class ScreenViewController {
         Map<String, Object> result = new ConcurrentHashMap<>();
         float realTimePower = 0;// 实时功率
         if (stationID != null) {
-            List<PileDto> pileByStationID = localMemoryData.getPileByStation(stationID);
-            for (PileDto pileDto : pileByStationID) {
-                List<GunMonitorDto> gunByPile = localMemoryData.getGunByPile(pileDto.getId());
-                for (GunMonitorDto real : gunByPile) {
-                    if (real.getGunState() == GunStateEnum.CHARGING && real.getCurrent() != null
-                            && real.getVoltage() != null) {
-                        realTimePower += (real.getCurrent() / 1000) * (real.getVoltage() / 1000);
-                    }
+            List<GunMonitorDto> getGunByStation = localMemoryData.getGunByStation(stationID);
+            for (GunMonitorDto real : getGunByStation) {
+                if (real.getGunState() == 3 && real.getCurrent() != null
+                        && real.getVoltage() != null) {
+                    realTimePower += (real.getCurrent() / 1000) * (real.getVoltage() / 1000);
                 }
             }
             result.put("realTimePower", AmountUtils.divOfStr(realTimePower + "", 1000 + "", 0));// 实时总功率

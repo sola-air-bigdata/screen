@@ -2,6 +2,8 @@ package com.nzkj.screen.memory;
 
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.nzkj.screen.Entity.DTO.*;
 
 import com.nzkj.screen.Entity.Station;
@@ -35,6 +37,7 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 	private  static Map<String, Long> pileIdMap = new ConcurrentHashMap<>();
 	//pileId -> gun在redis的key
 	private  static Map<Long, Set<String>> pileGunMap = new ConcurrentHashMap<>();
+	private static Map<Long,Set<String>> stationGunMap = new ConcurrentHashMap<>();
 	private  static Map<Long, Set<Long>> sellerStationMap = new ConcurrentHashMap<>();
 	private  static Map<Long, Set<Long>> stationPileMap = new ConcurrentHashMap<>();
 	private  static Map<String, StationDto> stationNoMap = new ConcurrentHashMap<>();
@@ -47,6 +50,12 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 	@Autowired
 	@Qualifier("redisTemplate")
 	private RedisTemplate redisJsonTemplate;
+
+	@Autowired
+	public RedisUtils redisTemp;
+
+	@Autowired
+	public StringRedisTemplate StringredisTemplate;
 
 //	@Resource
 //	private StringRedisTemplate redisTemplate;
@@ -140,27 +149,27 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 			}
 			sellerStationMap.put(sellerId,stations);
 		}
-		Set<Long> piles = new HashSet<>(), stationPiles = null;
-		for(Long stationId: stations) {
-			stationPiles = stationPileMap.get(stationId);
-			if(CollectionUtil.isNotEmpty(stationPiles)) {
-				piles.addAll(stationPiles);
-			}else{
-				stationPiles = pileMapper.findPileByStationId(stationId);
-				if(CollectionUtil.isNotEmpty(stationPiles)){
-					stationPileMap.put(stationId,stationPiles);
-					piles.addAll(stationPiles);
-				}
-			}
-		}
-		if(CollectionUtil.isEmpty(piles)) {
-			return Collections.emptyList();
-		}
+//		Set<Long> piles = new HashSet<>(), stationPiles = null;
+//		for(Long stationId: stations) {
+//			stationPiles = stationPileMap.get(stationId);
+//			if(CollectionUtil.isNotEmpty(stationPiles)) {
+//				piles.addAll(stationPiles);
+//			}else{
+//				stationPiles = pileMapper.findPileByStationId(stationId);
+//				if(CollectionUtil.isNotEmpty(stationPiles)){
+//					stationPileMap.put(stationId,stationPiles);
+//					piles.addAll(stationPiles);
+//				}
+//			}
+//		}
+//		if(CollectionUtil.isEmpty(piles)) {
+//			return Collections.emptyList();
+//		}
 		final List<String> keys = new ArrayList<>();
 		
 		Set<String> gunKeys = null;
-		for(Long pileId : piles) {
-			gunKeys = pileGunMap.get(pileId);
+		for(Long stationId : stations) {
+			gunKeys = stationGunMap.get(stationId);
 			if(CollectionUtil.isNotEmpty(gunKeys)) {
 				keys.addAll(gunKeys);
 			}
@@ -168,16 +177,37 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		if(keys.size() == 0) {
 			return Collections.emptyList();
 		}
-		return redisJsonTemplate.executePipelined(new RedisCallback<GunMonitorDto>() {
-			@Override
-			public GunMonitorDto doInRedis(RedisConnection conn) throws DataAccessException {
-				conn.openPipeline();
-				for(int i = 0, size = keys.size(); i < size; i++) {
-					conn.get(keys.get(i).getBytes());
+		List<GunMonitorDto> gunMonitorDtoList = new ArrayList<GunMonitorDto>();
+		try {
+			List<Object> results = StringredisTemplate.executePipelined(new RedisCallback<Object>() {
+				@Override
+				public String doInRedis(RedisConnection conn) throws DataAccessException {
+					conn.openPipeline();
+					for (int i = 0; i < keys.size(); i++) {
+						String key = keys.get(i).toString().replaceAll(RedisDataEnum.GUNKEYSCACHE.getPrefix(), RedisDataEnum.GUNMONITOR.getPrefix());
+						conn.get(key.getBytes());
+					}
+					return null;
 				}
-				return null;
+			});
+			if (results != null && !results.isEmpty()) {
+				for (int j = 0; j < results.size(); j++) {
+					String monitorvalue = (String) results.get(j);
+					if (monitorvalue != null) {
+						JSONObject o = (JSONObject) JSONObject.parse(monitorvalue);
+						o.remove("@type");
+						GunMonitorDto monitorDto = o.toJavaObject(GunMonitorDto.class);
+//						GunMonitorDto monitorDto = (GunMonitorDto) JSONObject.parse(monitorvalue);
+						gunMonitorDtoList.add(monitorDto);
+					}
+				}
 			}
-		},redisJsonTemplate.getValueSerializer());
+			return CollectionUtil.newArrayList(gunMonitorDtoList);
+		}catch ( Exception e){
+			e.printStackTrace();
+//			log.error("调用配置服务获【查询枪gunKeys】失败，返回空,事件编码：l020100027 站点ID【{}】", stationId);
+			return CollectionUtil.newArrayList(gunMonitorDtoList);
+		}
 	}
 
 	@Override
@@ -234,19 +264,109 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 			if(CollectionUtil.isNotEmpty(stationPiles)){
 				stationPileMap.put(stationId,stationPiles);
 				piles.addAll(stationPiles);
-				for (Long pileId : stationPiles){
-					//依靠pileId去查gun  mysql访问量会很大 先试试别的方法
-					Set<String> gunKeys= new HashSet<>();
-					guns = gunMapper.findGunNoByPileId(pileId);
-					for(Long gunNo : guns){
-						key = buildKey(RedisDataEnum.GUN, stationId, pileId, gunNo);
-						gunKeys.add(key);
-					}
-					pileGunMap.put(pileId,gunKeys);
-				}
 			}
+
+			//初始化站点下所有的gunKey
+			String gunKeysCachekey = redisTemp.buildKey(RedisDataEnum.GUNKEYSCACHE, stationId);
+			String value = StringredisTemplate.opsForValue().get(gunKeysCachekey);
+			if(StrUtil.isEmpty(value)){
+				continue;
+			}
+			JSONArray array = JSONArray.parseArray(value);
+			Set<String> gunKeys= new HashSet<>();
+			for (int i = 0; i < array.size(); i++) {
+				String keys = array.get(i).toString().replaceAll(RedisDataEnum.GUNKEYSCACHE.getPrefix(), RedisDataEnum.GUNMONITOR.getPrefix());
+				gunKeys.add(keys);
+			}
+			stationGunMap.put(stationId,gunKeys);
 		}
-		//先从数据库查出所有 gunId 并且对应的pileId stationId  一些废弃的gun也可能被添加进去？？
+
+		//统计功率放到redis
+		int powerCount = 0;
+		int gunCount = 0;// 枪总数
+		int charging = 0;// 充电中的枪
+		int free = 0;// 空闲中的枪
+		int chargePrepare = 0;// 充电准备中的枪
+		int chargeFinish = 0;// 充电完成中的枪
+		int offLine = 0;// 离线中的枪
+		int problem = 0;// 故障中的枪
+		int bespeak = 0;// 预约中的枪
+		for(Long stationId: stations) {
+			Set<String> array = stationGunMap.get(stationId);
+
+			if(array != null){
+				List<Object> results = StringredisTemplate.executePipelined(new RedisCallback<Object>() {
+					@Override
+					public String doInRedis(RedisConnection conn) throws DataAccessException {
+						conn.openPipeline();
+						for (String key : array) {
+							conn.get(key.getBytes());
+						}
+						return null;
+					}
+				});
+				if (results != null && !results.isEmpty()) {
+					for (int j = 0; j < results.size(); j++) {
+						String monitorvalue = (String) results.get(j);
+						if (monitorvalue != null) {
+//							GunMonitorDto monitorDto = (GunMonitorDto) JSONObject.parse(monitorvalue);
+							JSONObject o = (JSONObject) JSONObject.parse(monitorvalue);
+							o.remove("@type");
+							GunMonitorDto monitorDto = o.toJavaObject(GunMonitorDto.class);
+//							// 充电枪信息统计
+							powerCount += monitorDto.getPower();
+							switch (monitorDto.getGunState()) {
+								case 3:
+									// 充电中的电枪
+									charging++;
+									break;
+
+								case 1:
+									// 空闲中的电枪
+									free++;
+									break;
+
+								case 4:
+									// 已充满的枪
+									chargeFinish++;
+									break;
+								case 5:
+									// 离线中的电枪
+									offLine++;
+									break;
+								case 2:
+									// 充电准备中的电枪
+									chargePrepare++;
+									break;
+								case 8:
+									// 预约的电枪
+									bespeak++;
+									break;
+								case 7:
+									// 告警中的电枪
+									problem++;
+									break;
+								default:
+									break;
+							}
+						}
+					}
+				}
+
+			}
+			}
+
+		// 将第一次统计结果缓存到redis  后续变化统计由sparkStreaming完成
+		redisJsonTemplate.opsForValue().set("powerSum-"+sellerId,powerCount);
+		redisJsonTemplate.opsForValue().set("chargingCount-"+sellerId,charging);
+		redisJsonTemplate.opsForValue().set("freeCount-"+sellerId,free);
+		redisJsonTemplate.opsForValue().set("chargeFinishCount-"+sellerId,chargeFinish);
+		redisJsonTemplate.opsForValue().set("offlineCount-"+sellerId,offLine);
+		redisJsonTemplate.opsForValue().set("chargePrepareCount-"+sellerId,chargePrepare);
+		redisJsonTemplate.opsForValue().set("bespeakCount-"+sellerId,bespeak);
+		redisJsonTemplate.opsForValue().set("problemCount-"+sellerId,problem);
+
+
 	}
 
 //	private void initRedisData(Long seller){
@@ -258,42 +378,48 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 
 	@Override
 	public List<GunMonitorDto> getGunByStation(Long stationId) {
-		Set<String> gunKeys = null;
-		Set<Long> piles = stationPileMap.get(stationId);
-		if(CollectionUtil.isEmpty(piles)) {
-			return Collections.emptyList();
+		List<GunMonitorDto> gunMonitorDtoList = new ArrayList<GunMonitorDto>();
+		String gunKeysCachekey = redisTemp.buildKey(RedisDataEnum.GUNKEYSCACHE, stationId);
+		String value = StringredisTemplate.opsForValue().get(gunKeysCachekey);
+		if(StrUtil.isEmpty(value)){
+//			log.error("调用配置服务获【查询枪gunKeys】失败，返回空,事件编码：l020100025 站点ID【{}】", stationId);
+			return CollectionUtil.newArrayList(gunMonitorDtoList);
 		}
-		final List<String> keys = new ArrayList<>();
-
-
-		for(Long pileId : piles) {
-			gunKeys = pileGunMap.get(pileId);
-			if(CollectionUtil.isNotEmpty(gunKeys)) {
-				keys.addAll(gunKeys);
-			}
-		}
-		if(keys.size() == 0) {
-			return Collections.emptyList();
-		}
-//		return redisJsonTemplate.executePipelined((RedisCallback<GunMonitorDto>) conn -> {
-//			conn.openPipeline();
-//			for(int i = 0, size = keys.size(); i < size; i++) {
-//				conn.get(keys.get(i).getBytes());
-//			}
-//			return null;
-//		},redisJsonTemplate.getValueSerializer());
-
-		return redisJsonTemplate.executePipelined(new RedisCallback<GunMonitorDto>() {
-			@Override
-			public GunMonitorDto doInRedis(RedisConnection conn) throws DataAccessException {
-				conn.openPipeline();
-				for(int i = 0, size = keys.size(); i < size; i++) {
-					conn.get(keys.get(i).getBytes());
+		JSONArray array = JSONArray.parseArray(value);
+		try {
+			List<Object> results = StringredisTemplate.executePipelined(new RedisCallback<Object>() {
+				@Override
+				public String doInRedis(RedisConnection conn) throws DataAccessException {
+					conn.openPipeline();
+					for (int i = 0; i < array.size(); i++) {
+						String keys = array.get(i).toString().replaceAll(RedisDataEnum.GUNKEYSCACHE.getPrefix(), RedisDataEnum.GUNMONITOR.getPrefix());
+						conn.get(keys.getBytes());
+					}
+					return null;
 				}
-				return null;
+			});
+			if (results != null && !results.isEmpty()) {
+				for (int j = 0; j < results.size(); j++) {
+					String monitorvalue = (String) results.get(j);
+					if (monitorvalue != null) {
+						JSONObject o = (JSONObject) JSONObject.parse(monitorvalue);
+						o.remove("@type");
+						GunMonitorDto monitorDto = o.toJavaObject(GunMonitorDto.class);
+//						GunMonitorDto monitorDto = (GunMonitorDto) JSONObject.parse(monitorvalue);
+						gunMonitorDtoList.add(monitorDto);
+					}
+				}
 			}
-		},redisJsonTemplate.getValueSerializer());
+			return CollectionUtil.newArrayList(gunMonitorDtoList);
+		}catch ( Exception e){
+			e.printStackTrace();
+//			log.error("调用配置服务获【查询枪gunKeys】失败，返回空,事件编码：l020100027 站点ID【{}】", stationId);
+			return CollectionUtil.newArrayList(gunMonitorDtoList);
+		}
+
 	}
+
+
 
 
 }
