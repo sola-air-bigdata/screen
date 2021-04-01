@@ -1,669 +1,698 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>广州公交新能源-如约充电-车队用户</title>
-        <link rel="stylesheet" href="./css/inside.css">
-        <link rel="stylesheet" href="./css/site-center.css">
-        <style>
-            .ranking_circle{
-                position: relative;
-                top: 6px;
-                left: 15px;
-            }
-            .charge_data li{
-                height: 50px;
-            }
-            .charge_data .circle{
-                margin-top: 22px;
-            }
-            #peak_valley{
-                width: 180px;
-                height: 180px;
-                margin-top: 56px;
-            }
-            #center_bg{
-                position: relative;
-                top: 60px;
-                left: -60px;
-            }
-            .box_content>.animate_center{
-                width: 64px;
-                height: 64px;
-                float: left;
-            }
-        </style>
-    </head>
-    <body class="scaled">
-        <div class="main">
-            <time id="time"></time>
-            <div id="title_bg" style="position: absolute;top:-7px;left:536px;z-index:9999;"></div>
-            <div style="height: 450px;width: 1850px;">
-                <div class="part part1">
-                    <section class="inside inside1">
-                        <div class="station_title">
-                            <div class="station_circle fl" id="backIndex"></div>
-                            <h1 style="padding-top:10px;margin-left:20px;display: inline-block;" id="r_stationName"></h1>
-                            <div class="station_select">
-                                <select class="form_select" id="stationList" onchange="changeStation();">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="station_content mt40" style="height: 270px;">
-                            <div class="fl station_img">
-                                <img src="./img/map1.png" alt="" id="s_stationImage">
-                            </div>
-                            <div class="fl station_text">
-                                <h1 style="font-weight:500;" id="s_stationName"><span class="mc_2bd fs_20"> 对外</span></h1>
-                                <div class="mt20">
-                                    <span class="mc_8bc fs_20">桩数:<span style="color:#fff;font-size: 40px;" id="s_stationPile" class="myfont"> 0</span></span>
-                                    <ul class="station_list">
-                                        <li style="width:30%;border-right:none;background: rgba(0, 255, 123, 0.5);">快</li>
-                                        <li style="width:66%;background: rgba(0, 255, 123, 0.3);" id="s_free">0</li>
-                                    </ul>
-                                    <span class="mc_2bd"><span style="font-size:26px;" id="s_electricityPrice">1.20</span>元/度</span>
-                                </div>
-                                <div class="mc_8bc" style="margin-top: 10px;">地址：<span id="s_stationaddres"></span></div>
-                                <div class="mc_8bc" style="margin-top: 10px;">评分：<div id="star_grade" style="display:inline-block;"></div></div>
-                            </div>
-                        </div>
-                    </section>
-                    <section class="inside inside2">
-                        <div style="margin-top: 26px;">
-                            <ul class="service_times">
-                                <li>
-                                    <div id="total_num" class="animate_inside"></div>
-                                    <p class="mc_8bc" style="margin-top:4px;" id="serviceDw">总充电数(次)</p>
-                                    <p><span><span style="font-size:40px;" id="s_monthServicesNums" class="myfont">0</span></span></p>
-                                </li>
-                                <li>
-                                    <div id="total_quantity" class="animate_inside"></div>
-                                    <p class="mc_8bc" style="margin-top:4px;" id="isWan">总充电(KWH)</p>
-                                    <p><span style="font-size:40px;" id="s_monthTotalPower" class="myfont">0</span></p>
-                                </li>
-                                <li>
-                                    <div id="total_income" class="animate_inside"></div>
-                                    <p class="mc_8bc" style="margin-top:4px;" id="incomeDw">累计收入(元)</p>
-                                    <p><span style="font-size:40px;" class="myfont" id="s_monthTotalRevenue">0</span></p>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-                    <section class="inside inside3">
-                        <div class="subtitle">
-                            <h1 style="top: 28px;font-size:20px;">站充电设备</h1>
-                        </div>
-                        <ul class="station_device_info">
-                            <li>
-                                <img class="fl" src="./img/overview-9.png" alt="">
-                                <span class="mc_8bc power">设备总功率</span>
-                                <span id="s_totalPowerOfEquipment"><span style="font-size:40px;" class="myfont">0</span> KW</span>
-                            </li>
-                            <li>
-                                <img class="fl" src="./img/overview-10.png" alt="">
-                                <span class="mc_8bc power">变压功率</span>
-                                <span  id="s_variableVoltagePower"><span style="font-size:40px;" class="myfont">0</span> KW</span>
-                            </li>
-                            <li>
-                                <img class="fl" src="./img/overview-11.png" alt="">
-                                <span class="mc_8bc power">充电电能</span>
-                                <span id="s_chargingEnergy"><span style="font-size:40px;" class="myfont">0</span> KWH</span>
-                            </li>
-                        </ul>
-                    </section>
-                    <section class="inside inside4">
-                        <div class="subtitle">
-                            <h1 style="top: 28px;font-size:20px;">时段充电汇总</h1>
-                        </div>
-                        <div>
-                            <div class="fl" style="width:168px;height: 200px;">
-                                <img src="./img/peak.gif" alt="" style="width:90%;margin-top:32px;border-radius:50%;">
-                            </div>
-                            <div class="charge_data mt20" style="padding-top:4px;">
-                                <ul>
-                                    <li>
-                                        <div class="circle circle1"></div>
-                                        <span class="mc_8bc">尖</span>
-                                        <span class="mc_fff"  id="s_jianCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-                                    </li>
-                                    <li>
-                                        <div class="circle circle2"></div>
-                                        <span class="mc_8bc">峰</span>
-                                        <span class="mc_fff"  id="s_fengCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-                                    </li>
-                                    <li>
-                                        <div class="circle circle3"></div>
-                                        <span class="mc_8bc">平</span>
-                                        <span class="mc_fff"  id="s_pingCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-                                    </li>
-                                    <li>
-                                        <div class="circle circle4"></div>
-                                        <span class="mc_8bc">谷</span>
-                                        <span class="mc_fff"  id="s_guCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-                                    </li>
-                                </ul> 
-                            </div> 
-                        </div>
-                    </section>
-                </div>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>广州公交新能源-如约充电-车队用户</title>
+  <link rel="stylesheet" href="./css/inside.css">
+  <link rel="stylesheet" href="./css/site-center.css">
+  <style>
+    .ranking_circle {
+      position: relative;
+      top: 6px;
+      left: 15px;
+    }
+
+    .charge_data li {
+      height: 50px;
+    }
+
+    .charge_data .circle {
+      margin-top: 22px;
+    }
+
+    #peak_valley {
+      width: 180px;
+      height: 180px;
+      margin-top: 56px;
+    }
+
+    #center_bg {
+      position: relative;
+      top: 60px;
+      left: -60px;
+    }
+
+    .box_content>.animate_center {
+      width: 64px;
+      height: 64px;
+      float: left;
+    }
+  </style>
+</head>
+
+<body class="scaled">
+  <div class="main">
+    <time id="time"></time>
+    <div id="title_bg" style="width:1651px; height: 117px; position: absolute;top:-7px;left:136px;z-index:9999;"></div>
+    <div style="height: 450px;width: 1850px;">
+      <div class="part part1">
+        <section class="inside inside1">
+          <div class="station_title">
+            <div class="station_circle fl" id="backIndex"></div>
+            <h1 style="padding-top:10px;margin-left:20px;display: inline-block;" id="r_stationName"></h1>
+            <div class="station_select">
+              <select class="form_select" id="stationList" onchange="changeStation();">
+              </select>
             </div>
-            <div style="height: 530px;width: 1850px;">
-                <div class="part part2">
-                    <section class="inside inside5">
-                        <div class="inside_title">
-                            <div id="fleet_user" class="fleet_animate"></div>
-                            <h1>团体会员分析</h1>
-                        </div>
-                        <div class="charging_capacity">
-                            <ul>
-                                <li>
-                                    当日峰充电量：<span id='peakPower' class="myfont">81802</span>&nbsp;<span>度</span>&nbsp;<span>/</span>&nbsp;<span id='peakPer'>90%</span>
-                                </li>
-                                <li>
-                                    当日平充电量：<span id='flatPower' class="myfont">9912</span>&nbsp;<span>度</span>&nbsp;<span>/</span>&nbsp;<span id='flatPer'>8%</span>
-                                </li>
-                                <li>
-                                    当日谷充电量：<span id='ravinePower' class="myfont">1003</span>&nbsp;<span>度</span>&nbsp;<span>/</span>&nbsp;<span id='ravinePer'>2%</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-12px;">
-                            <h1>团队时段充电分析</h1>
-                        </div>
-                        <div id="analysis" style="height:110px;width:100%;"></div>
-                        <div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-8px;">
-                            <h1>团队单车充电排名</h1>
-                        </div>
-                        <div class="site_service">
-                            <ul style="padding-left: 10px;">
-                                <li>
-                                    <div class="site_number"><span class="site_number_1" style="background: url('./img/num1.png') no-repeat;background-size: 100% 100%;">1</span></div>
-                                    <div class="site_content">
-                                        <div class="site_name">
-                                            <h1 class="fl" style="line-height:24px;height:24px;font-weight:500;font-size: 14px;" id='carName0'>一汽车队</h1>
-                                            <p class="fr mr20"><span style="font-size:14px;" id='carRank0'>80</span>次/月</p>
-                                            <img src="./img/arrow-down.png" alt="" id='imgArrow0'>
-                                        </div>
-                                        <div class="site_num mt1">
-                                            平均充电量:<span><span id='carPower0'>120</span>度/次</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="site_number"><span class="site_number_1" style="background: url('./img/num2.png') no-repeat;background-size: 100% 100%;">2</span></div>
-                                    <div class="site_content">
-                                        <div class="site_name">
-                                            <h1 class="fl" style="line-height:24px;height:24px;font-weight:500;font-size: 14px;" id='carName1'>白云出租车队</h1>
-                                            <p class="fr mr20"><span style="font-size:14px;" id='carRank1'>72</span>次/月</p>
-                                            <img src="./img/arrow-up.png" alt="" id='imgArrow1'>
-                                        </div>
-                                        <div class="site_num mt1">
-                                            平均充电量:<span><span id='carPower1'>120</span>度/次</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="site_number"><span class="site_number_1" style="background: url('./img/num3.png') no-repeat;background-size: 100% 100%;">3</span></div>
-                                    <div class="site_content" style="border-bottom:none;">
-                                        <div class="site_name">
-                                            <h1 class="fl" style="line-height:24px;height:24px;font-weight:500;font-size: 14px;" id='carName2'>广汽车队</h1>
-                                            <p class="fr mr20"><span style="font-size:14px;" id='carRank2'>67</span>次/月</p>
-                                            <img src="./img/arrow-down.png" alt="" id='imgArrow2'>
-                                        </div>
-                                        <div class="site_num mt1">
-                                            平均充电量:<span><span id='carPower2'>120</span>度/次</span>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-                </div>
-                <div class="part part3">
-                    <div class="site_nav">
-                        <ul>
-                            <li id="siteZong">
-                                <img src="./img/nav-overview.png" alt="" style="left:3px;">
-                                <p>站点总览</p>
-                            </li>
-                            <li class="active">
-                                <img src="./img/nav-users-1.png" alt="">
-                                <p>站点用户</p> 
-                            </li>
-                        </ul>
-                    </div>
-                    <section class="site_center site_center4 fl" style="padding-top: 20%;">
-                        <div class="box_content box_content1" style="top: 218px;left: 510px;opacity:0;">
-                            <div id="fleet1" class="animate_center"></div>
-                            <h1>服务车队用户总数</h1>
-                            <p><span style="font-size:36px;" id='serviceMember' class="myfont">108</span>个</p>
-                        </div>
-                        <div class="box_content box_content2" style="top: 218px;left: 510px;opacity:0;">
-    
-                            <div id="fleet2" class="animate_center"></div>
-                            <h1>服务车队车辆总数</h1>
-                            <p><span style="font-size:36px;" id='serviceTeamCar' class="myfont">600</span>辆</p>
-                        </div>
-                        <div class="box_content box_content3" style="top: 218px;left: 510px;opacity:0;">
-                            <div id="fleet3" class="animate_center"></div>
-                            <h1>车队单车充电量</h1>
-                            <p><span style="font-size:36px;" id='busPower' class="myfont">126</span>度/次</p>
-                        </div>
-                        <div class="box_content box_content4" style="top: 218px;left: 510px;opacity:0;">
-                            <div id="fleet4" class="animate_center"></div>
-                            <h1>车队单车消费</h1>
-                            <p><span style="font-size:36px;" id='busBalance' class="myfont">80</span>元/次</p>
-                        </div>
-                    </section>
-                    <section class="site_center site_center2 fl">
-                        <div class="center_head" style="position:absolute;top:128px;left: 142px;width: 500px;">
-                            <div id="center_img_bg"></div>
-                            <img id="center_img" src="./img/0001.png" alt="">
-                        </div>
-                        <div class="center_nav">
-                            <ul>
-                                <li id="siteGeren">
-                                    <p>
-                                        <img width="42" src="./img/user1.png" alt=""><span>普通会员</span>
-                                    </p>
-                                </li>
-                                <li class="active" id="siteChedui">
-                                    <p>
-                                        <img width="48" src="./img/user2.png" alt="" style="left:40px;"><span>团体会员</span>
-                                    </p>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-                    <section class="site_center site_center5 fl" style="padding-top: 20%;">
-                        <div class="box_content box_content5" style="top: 218px;left: -436px;opacity:0;">
-                            <div id="fleet5" class="animate_center"></div>
-                            <h1>车队均充电频率</h1>
-                            <p><span style="font-size:36px;" id='busRechargeCount' class="myfont">2</span>次/天/辆</p>
-                        </div>
-                        <div class="box_content box_content6" style="top: 218px;left: -436px;opacity:0;">
-                            <div id="fleet6" class="animate_center"></div>
-                            <h1>车队日充电量</h1>
-                            <p><span style="font-size:36px;" id='memberPower' class="myfont">99820</span>度</p>
-                        </div>
-                        <div class="box_content box_content7" style="top: 218px;left: -436px;opacity:0;">
-                            <div id="fleet7" class="animate_center"></div>
-                            <h1>车队日充电次数</h1>
-                            <p><span style="font-size:36px;" id='memberRechargeCount' class="myfont">1280</span>次</p>
-                        </div>
-                        <div class="box_content box_content8" style="top: 218px;left: -436px;opacity:0;">
-                            <div id="fleet8" class="animate_center"></div>
-                            <h1>车队均充电时长</h1>
-                            <p><span style="font-size:36px;" id='busRechargeTime' class="myfont">2.3</span>小时/辆</p>
-                        </div>
-                    </section>
-                </div>
-                <div class="part part4">
-                    <section class="inside inside6">
-                        <div class="inside_title">
-                            <div id="consumption_rank" class="fleet_animate"></div>
-                            <h1>团队平均月充电消费排名</h1>
-                        </div>
-                        <div class="ranking" style="margin-top: 10px;">
-                            <ul>
-                                <li> 
-                                    <div class="ranking_circle">
-                                        <img src="./img/5.png" alt="" id='carCIcon0'>
-                                    </div>
-                                    <div class="ranking_right">
-                                        <div class="fl" id='carCName0'>一汽车队</div><span id='memberId0' style="display:none"></span>
-                                        <div class="fr"><span id='carCMoney0'>12345</span>元<img width="20" src="./img/arrow-down.png" alt="" id='carCImg0'></div>
-                                        <div class="time">
-                                            <div class="fl">累计消费：<span id='carCBill0'>609</span>元</div>
-                                            <div class="fr">车辆数：<span id='carCCount0'>50</span>辆</div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="ranking_circle">
-                                        <img src="./img/5.png" alt="" id='carCIcon1'>
-                                    </div>
-                                    <div class="ranking_right">
-                                        <div class="fl" id='carCName1'>一汽车队</div><span id='memberId1' style="display:none"></span>
-                                        <div class="fr"><span id='carCMoney1'>12345</span>元 <img width="20" src="./img/arrow-up.png" alt="" id='carCImg1'></div>
-                                        <div class="time">
-                                            <div class="fl">累计消费：<span id='carCBill1'>609</span>元</div>
-                                            <div class="fr">车辆数：<span id='carCCount1'>50</span>辆</div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="ranking_circle">
-                                        <img src="./img/5.png" alt="" id='carCIcon2'>
-                                    </div>
-                                    <div class="ranking_right">
-                                        <div class="fl" id='carCName2'>一汽车队</div><span id='memberId2' style="display:none"></span>
-                                        <div class="fr"><span id='carCMoney2'>12345</span>元<img width="20" src="./img/arrow-up.png" alt="" id='carCImg2'></div>
-                                        <div class="time">
-                                            <div class="fl">累计消费：<span id='carCBill2'>609</span>元</div>
-                                            <div class="fr">车辆数：<span id='carCCount2'>50</span>辆</div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="ranking_circle">
-                                        <img src="./img/5.png" alt="" id='carCIcon3'>
-                                    </div>
-                                    <div class="ranking_right">
-                                        <div class="fl" id='carCName3'>一汽车队</div><span id='memberId3' style="display:none"></span>
-                                        <div class="fr"><span id='carCMoney3'>12345</span>元<img width="20" src="./img/arrow-down.png" alt="" id='carCImg3'></div>
-                                        <div class="time">
-                                            <div class="fl">累计消费：<span id='carCBill3'>609</span>元</div>
-                                            <div class="fr">车辆数：<span id='carCCount3'>50</span>辆</div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="ranking_circle">
-                                        <img src="./img/5.png" alt="" id='carCIcon4'>
-                                    </div>
-                                    <div class="ranking_right">
-                                        <div class="fl" id='carCName4'>一汽车队</div><span id='memberId4' style="display:none"></span>
-                                        <div class="fr"><span id='carCMoney4'>12345</span>元<img width="20" src="./img/arrow-down.png" alt="" id='carCImg4'></div>
-                                        <div class="time">
-                                            <div class="fl">累计消费：<span id='carCBill4'>609</span>元</div>
-                                            <div class="fr">车辆数：<span id='carCCount4'>50</span>辆</div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="ranking_circle">
-                                        <img src="./img/5.png" alt="" id='carCIcon5'>
-                                    </div>
-                                    <div class="ranking_right">
-                                        <div class="fl" id='carCName5'>一汽车队</div><span id='memberId5' style="display:none"></span>
-                                        <div class="fr"><span id='carCMoney5'>12345</span>元<img width="20" src="./img/arrow-down.png" alt="" id='carCImg5'></div>
-                                        <div class="time">
-                                            <div class="fl">累计消费：<span id='carCBill5'>609</span>元</div>
-                                            <div class="fr">车辆数：<span id='carCCount5'>50</span>辆</div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-                </div>
+          </div>
+          <div class="station_content mt40" style="height: 270px;">
+            <div class="fl station_img">
+              <img src="./img/map1.png" alt="" id="s_stationImage">
             </div>
-            
-            <div style="position:absolute;left:0;top:9px;">
-                <img src="./img/left.png" alt="">
+            <div class="fl station_text">
+              <h1 style="font-weight:500;" id="s_stationName"><span class="mc_2bd fs_20"> 对外</span></h1>
+              <div class="mt20">
+                <span class="mc_8bc fs_20">桩数:<span style="color:#fff;font-size: 40px;" id="s_stationPile"
+                    class="myfont"> 0</span></span>
+                <ul class="station_list">
+                  <li style="width:30%;border-right:none;background: rgba(0, 255, 123, 0.5);">快</li>
+                  <li style="width:66%;background: rgba(0, 255, 123, 0.3);" id="s_free">0</li>
+                </ul>
+                <span class="mc_2bd"><span style="font-size:26px;" id="s_electricityPrice">1.20</span>元/度</span>
+              </div>
+              <div class="mc_8bc" style="margin-top: 10px;">地址：<span id="s_stationaddres"></span></div>
+              <div class="mc_8bc" style="margin-top: 10px;">评分：<div id="star_grade" style="display:inline-block;"></div>
+              </div>
             </div>
-            <div style="position:absolute;right:0px;top:9px;">
-                <img src="./img/right.png" alt="">
+          </div>
+        </section>
+        <section class="inside inside2">
+          <div style="margin-top: 26px;">
+            <ul class="service_times">
+              <li>
+                <div id="total_num" class="animate_inside"></div>
+                <p class="mc_8bc" style="margin-top:4px;" id="serviceDw">总充电数(次)</p>
+                <p><span><span style="font-size:40px;" id="s_monthServicesNums" class="myfont">0</span></span></p>
+              </li>
+              <li>
+                <div id="total_quantity" class="animate_inside"></div>
+                <p class="mc_8bc" style="margin-top:4px;" id="isWan">总充电(KWH)</p>
+                <p><span style="font-size:40px;" id="s_monthTotalPower" class="myfont">0</span></p>
+              </li>
+              <li>
+                <div id="total_income" class="animate_inside"></div>
+                <p class="mc_8bc" style="margin-top:4px;" id="incomeDw">累计收入(元)</p>
+                <p><span style="font-size:40px;" class="myfont" id="s_monthTotalRevenue">0</span></p>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section class="inside inside3">
+          <div class="subtitle">
+            <h1 style="top: 28px;font-size:20px;">站充电设备</h1>
+          </div>
+          <ul class="station_device_info">
+            <li>
+              <img class="fl" src="./img/overview-9.png" alt="">
+              <span class="mc_8bc power">设备总功率</span>
+              <span id="s_totalPowerOfEquipment"><span style="font-size:40px;" class="myfont">0</span> KW</span>
+            </li>
+            <li>
+              <img class="fl" src="./img/overview-10.png" alt="">
+              <span class="mc_8bc power">变压功率</span>
+              <span id="s_variableVoltagePower"><span style="font-size:40px;" class="myfont">0</span> KW</span>
+            </li>
+            <li>
+              <img class="fl" src="./img/overview-11.png" alt="">
+              <span class="mc_8bc power">充电电能</span>
+              <span id="s_chargingEnergy"><span style="font-size:40px;" class="myfont">0</span> KWH</span>
+            </li>
+          </ul>
+        </section>
+        <section class="inside inside4">
+          <div class="subtitle">
+            <h1 style="top: 28px;font-size:20px;">时段充电汇总</h1>
+          </div>
+          <div>
+            <div class="fl" style="width:168px;height: 200px;">
+              <img src="./img/peak.gif" alt="" style="width:90%;margin-top:32px;border-radius:50%;">
             </div>
-            <div style="position:absolute;left:62px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
-            <div style="position:absolute;right:54px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
-            <div style="position:absolute;left:62px;bottom:18px;width: 1806px;height: 2px;background: #256CF9;z-index:9999;"></div>
+            <div class="charge_data mt20" style="padding-top:4px;">
+              <ul>
+                <li>
+                  <div class="circle circle1"></div>
+                  <span class="mc_8bc">尖</span>
+                  <span class="mc_fff" id="s_jianCharge"><span class="myfont"
+                      style="font-size: 36px;">0</span>kwh</span>
+                </li>
+                <li>
+                  <div class="circle circle2"></div>
+                  <span class="mc_8bc">峰</span>
+                  <span class="mc_fff" id="s_fengCharge"><span class="myfont"
+                      style="font-size: 36px;">0</span>kwh</span>
+                </li>
+                <li>
+                  <div class="circle circle3"></div>
+                  <span class="mc_8bc">平</span>
+                  <span class="mc_fff" id="s_pingCharge"><span class="myfont"
+                      style="font-size: 36px;">0</span>kwh</span>
+                </li>
+                <li>
+                  <div class="circle circle4"></div>
+                  <span class="mc_8bc">谷</span>
+                  <span class="mc_fff" id="s_guCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div style="height: 642px;width: 100%;">
+      <div class="part part2">
+        <section class="inside inside5">
+          <div class="inside_title">
+            <div id="fleet_user" class="fleet_animate"></div>
+            <h1>团体会员分析</h1>
+          </div>
+          <div class="charging_capacity">
+            <ul>
+              <li>
+                当日峰充电量：<span id='peakPower'
+                  class="myfont">81802</span>&nbsp;<span>度</span>&nbsp;<span>/</span>&nbsp;<span id='peakPer'>90%</span>
+              </li>
+              <li>
+                当日平充电量：<span id='flatPower'
+                  class="myfont">9912</span>&nbsp;<span>度</span>&nbsp;<span>/</span>&nbsp;<span id='flatPer'>8%</span>
+              </li>
+              <li>
+                当日谷充电量：<span id='ravinePower'
+                  class="myfont">1003</span>&nbsp;<span>度</span>&nbsp;<span>/</span>&nbsp;<span id='ravinePer'>2%</span>
+              </li>
+            </ul>
+          </div>
+          <div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-12px;">
+            <h1>团队时段充电分析</h1>
+          </div>
+          <div id="analysis" style="height:110px;width:100%;"></div>
+          <div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-8px;">
+            <h1>团队单车充电排名</h1>
+          </div>
+          <div class="site_service">
+            <ul style="padding-left: 10px;">
+              <li>
+                <div class="site_number"><span class="site_number_1"
+                    style="background: url('./img/num1.png') no-repeat;background-size: 100% 100%;">1</span></div>
+                <div class="site_content">
+                  <div class="site_name">
+                    <h1 class="fl" style="line-height:24px;height:24px;font-weight:500;font-size: 14px;" id='carName0'>
+                      一汽车队</h1>
+                    <p class="fr mr20"><span style="font-size:14px;" id='carRank0'>80</span>次/月</p>
+                    <img src="./img/arrow-down.png" alt="" id='imgArrow0'>
+                  </div>
+                  <div class="site_num mt1">
+                    平均充电量:<span><span id='carPower0'>120</span>度/次</span>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="site_number"><span class="site_number_1"
+                    style="background: url('./img/num2.png') no-repeat;background-size: 100% 100%;">2</span></div>
+                <div class="site_content">
+                  <div class="site_name">
+                    <h1 class="fl" style="line-height:24px;height:24px;font-weight:500;font-size: 14px;" id='carName1'>
+                      白云出租车队</h1>
+                    <p class="fr mr20"><span style="font-size:14px;" id='carRank1'>72</span>次/月</p>
+                    <img src="./img/arrow-up.png" alt="" id='imgArrow1'>
+                  </div>
+                  <div class="site_num mt1">
+                    平均充电量:<span><span id='carPower1'>120</span>度/次</span>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="site_number"><span class="site_number_1"
+                    style="background: url('./img/num3.png') no-repeat;background-size: 100% 100%;">3</span></div>
+                <div class="site_content" style="border-bottom:none;">
+                  <div class="site_name">
+                    <h1 class="fl" style="line-height:24px;height:24px;font-weight:500;font-size: 14px;" id='carName2'>
+                      广汽车队</h1>
+                    <p class="fr mr20"><span style="font-size:14px;" id='carRank2'>67</span>次/月</p>
+                    <img src="./img/arrow-down.png" alt="" id='imgArrow2'>
+                  </div>
+                  <div class="site_num mt1">
+                    平均充电量:<span><span id='carPower2'>120</span>度/次</span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+      <div class="part part3">
+        <div class="site_nav">
+          <ul>
+            <li id="siteZong">
+              <img src="./img/nav-overview.png" alt="" style="left:3px;">
+              <p>站点总览</p>
+            </li>
+            <li class="active">
+              <img src="./img/nav-users-1.png" alt="">
+              <p>站点用户</p>
+            </li>
+          </ul>
         </div>
+        <section class="site_center site_center4 fl" style="padding-top: 20%;">
+          <div class="box_content box_content1" style="top: 218px;left: 510px;opacity:0;">
+            <div id="fleet1" class="animate_center"></div>
+            <h1>服务车队用户总数</h1>
+            <p><span style="font-size:36px;" id='serviceMember' class="myfont">108</span>个</p>
+          </div>
+          <div class="box_content box_content2" style="top: 218px;left: 510px;opacity:0;">
 
-        <script src="./js/jquery.min.js" type="text/javascript"></script>
-        <script src="./js/echarts.min.js" type="text/javascript"></script>
-        <script defer src="./js/clock.js" type="text/javascript"></script>
-        <script src="./js/TweenLite.min.js" type="text/javascript"></script>
-		<script src="./js/lem_counter.js" type="text/javascript"></script>
-        <script type="text/javascript" src="./js/markingSystem.js"></script>
-         <script defer src="./js/stationInfo.js" type="text/javascript"></script>
-        <script src="./js/team-user.js" type="text/javascript"></script>
-        <script src="./js/lottie.js" type="text/javascript"></script>
-        <script src="./js/getanimate.js" type="text/javascript" charset="utf-8"></script>
+            <div id="fleet2" class="animate_center"></div>
+            <h1>服务车队车辆总数</h1>
+            <p><span style="font-size:36px;" id='serviceTeamCar' class="myfont">600</span>辆</p>
+          </div>
+          <div class="box_content box_content3" style="top: 218px;left: 510px;opacity:0;">
+            <div id="fleet3" class="animate_center"></div>
+            <h1>车队单车充电量</h1>
+            <p><span style="font-size:36px;" id='busPower' class="myfont">126</span>度/次</p>
+          </div>
+          <div class="box_content box_content4" style="top: 218px;left: 510px;opacity:0;">
+            <div id="fleet4" class="animate_center"></div>
+            <h1>车队单车消费</h1>
+            <p><span style="font-size:36px;" id='busBalance' class="myfont">80</span>元/次</p>
+          </div>
+        </section>
+        <section class="site_center site_center2 fl">
+          <div class="center_head" style="position:absolute;top:128px;left: 142px;width: 500px;">
+            <div id="center_img_bg"></div>
+            <img id="center_img" src="./img/0001.png" alt="">
+          </div>
+          <div class="center_nav">
+            <ul>
+              <li id="siteGeren">
+                <p>
+                  <img width="42" src="./img/user1.png" alt=""><span>普通会员</span>
+                </p>
+              </li>
+              <li class="active" id="siteChedui">
+                <p>
+                  <img width="48" src="./img/user2.png" alt="" style="left:40px;"><span>团体会员</span>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section class="site_center site_center5 fl" style="padding-top: 20%;">
+          <div class="box_content box_content5" style="top: 218px;left: -436px;opacity:0;">
+            <div id="fleet5" class="animate_center"></div>
+            <h1>车队均充电频率</h1>
+            <p><span style="font-size:36px;" id='busRechargeCount' class="myfont">2</span>次/天/辆</p>
+          </div>
+          <div class="box_content box_content6" style="top: 218px;left: -436px;opacity:0;">
+            <div id="fleet6" class="animate_center"></div>
+            <h1>车队日充电量</h1>
+            <p><span style="font-size:36px;" id='memberPower' class="myfont">99820</span>度</p>
+          </div>
+          <div class="box_content box_content7" style="top: 218px;left: -436px;opacity:0;">
+            <div id="fleet7" class="animate_center"></div>
+            <h1>车队日充电次数</h1>
+            <p><span style="font-size:36px;" id='memberRechargeCount' class="myfont">1280</span>次</p>
+          </div>
+          <div class="box_content box_content8" style="top: 218px;left: -436px;opacity:0;">
+            <div id="fleet8" class="animate_center"></div>
+            <h1>车队均充电时长</h1>
+            <p><span style="font-size:36px;" id='busRechargeTime' class="myfont">2.3</span>小时/辆</p>
+          </div>
+        </section>
+      </div>
+      <div class="part part4">
+        <section class="inside inside6">
+          <div class="inside_title">
+            <div id="consumption_rank" class="fleet_animate"></div>
+            <h1>团队平均月充电消费排名</h1>
+          </div>
+          <div class="ranking" style="margin-top: 10px;">
+            <ul>
+              <li>
+                <div class="ranking_circle">
+                  <img src="./img/5.png" alt="" id='carCIcon0'>
+                </div>
+                <div class="ranking_right">
+                  <div class="fl" id='carCName0'>一汽车队</div><span id='memberId0' style="display:none"></span>
+                  <div class="fr"><span id='carCMoney0'>12345</span>元<img width="20" src="./img/arrow-down.png" alt=""
+                      id='carCImg0'></div>
+                  <div class="time">
+                    <div class="fl">累计消费：<span id='carCBill0'>609</span>元</div>
+                    <div class="fr">车辆数：<span id='carCCount0'>50</span>辆</div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ranking_circle">
+                  <img src="./img/5.png" alt="" id='carCIcon1'>
+                </div>
+                <div class="ranking_right">
+                  <div class="fl" id='carCName1'>一汽车队</div><span id='memberId1' style="display:none"></span>
+                  <div class="fr"><span id='carCMoney1'>12345</span>元 <img width="20" src="./img/arrow-up.png" alt=""
+                      id='carCImg1'></div>
+                  <div class="time">
+                    <div class="fl">累计消费：<span id='carCBill1'>609</span>元</div>
+                    <div class="fr">车辆数：<span id='carCCount1'>50</span>辆</div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ranking_circle">
+                  <img src="./img/5.png" alt="" id='carCIcon2'>
+                </div>
+                <div class="ranking_right">
+                  <div class="fl" id='carCName2'>一汽车队</div><span id='memberId2' style="display:none"></span>
+                  <div class="fr"><span id='carCMoney2'>12345</span>元<img width="20" src="./img/arrow-up.png" alt=""
+                      id='carCImg2'></div>
+                  <div class="time">
+                    <div class="fl">累计消费：<span id='carCBill2'>609</span>元</div>
+                    <div class="fr">车辆数：<span id='carCCount2'>50</span>辆</div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ranking_circle">
+                  <img src="./img/5.png" alt="" id='carCIcon3'>
+                </div>
+                <div class="ranking_right">
+                  <div class="fl" id='carCName3'>一汽车队</div><span id='memberId3' style="display:none"></span>
+                  <div class="fr"><span id='carCMoney3'>12345</span>元<img width="20" src="./img/arrow-down.png" alt=""
+                      id='carCImg3'></div>
+                  <div class="time">
+                    <div class="fl">累计消费：<span id='carCBill3'>609</span>元</div>
+                    <div class="fr">车辆数：<span id='carCCount3'>50</span>辆</div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ranking_circle">
+                  <img src="./img/5.png" alt="" id='carCIcon4'>
+                </div>
+                <div class="ranking_right">
+                  <div class="fl" id='carCName4'>一汽车队</div><span id='memberId4' style="display:none"></span>
+                  <div class="fr"><span id='carCMoney4'>12345</span>元<img width="20" src="./img/arrow-down.png" alt=""
+                      id='carCImg4'></div>
+                  <div class="time">
+                    <div class="fl">累计消费：<span id='carCBill4'>609</span>元</div>
+                    <div class="fr">车辆数：<span id='carCCount4'>50</span>辆</div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ranking_circle">
+                  <img src="./img/5.png" alt="" id='carCIcon5'>
+                </div>
+                <div class="ranking_right">
+                  <div class="fl" id='carCName5'>一汽车队</div><span id='memberId5' style="display:none"></span>
+                  <div class="fr"><span id='carCMoney5'>12345</span>元<img width="20" src="./img/arrow-down.png" alt=""
+                      id='carCImg5'></div>
+                  <div class="time">
+                    <div class="fl">累计消费：<span id='carCBill5'>609</span>元</div>
+                    <div class="fr">车辆数：<span id='carCCount5'>50</span>辆</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
 
-        <script type="text/javascript">
-            $(function(){
-                $(".box_content1").animate({opacity:1,top: '18px',left: '100px',},800);
-                $(".box_content2").animate({opacity:1,top: '148px',left: '100px',},800);
-                $(".box_content3").animate({opacity:1,top: '278px',left: '100px',},800);
-                $(".box_content4").animate({opacity:1,top: '408px',left: '100px',},800);
-                $(".box_content5").animate({opacity:1,top: '18px',left: '-24px',},800);
-                $(".box_content6").animate({opacity:1,top: '148px',left: '-24px',},800);
-                $(".box_content7").animate({opacity:1,top: '278px',left: '-24px',},800);
-                $(".box_content8").animate({opacity:1,top: '408px',left: '-24px',},800);
-            })
+    <div style="position:absolute;left:0;top:9px;">
+      <img style="display: block;height: 1136px;" src="./img/left.png" alt="">
+    </div>
+    <div style="position:absolute;right:0px;top:9px;">
+      <img style="display: block;height: 1136px;" src="./img/right.png" alt="">
+    </div>
+    <div style="position:absolute;left:62px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
+    <div style="position:absolute;right:54px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
+    <div style="position:absolute;left:62px;bottom:18px;width: 1806px;height: 2px;background: #256CF9;z-index:9999;">
+    </div>
+  </div>
 
-            let bgParams = {//标题背景
-                container: document.getElementById("title_bg"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/bg/data.json"
+  <script src="./js/jquery.min.js" type="text/javascript"></script>
+  <script src="./js/echarts.min.js" type="text/javascript"></script>
+  <script defer src="./js/clock.js" type="text/javascript"></script>
+  <script src="./js/TweenLite.min.js" type="text/javascript"></script>
+  <script src="./js/lem_counter.js" type="text/javascript"></script>
+  <script type="text/javascript" src="./js/markingSystem.js"></script>
+  <script defer src="./js/stationInfo.js" type="text/javascript"></script>
+  <script src="./js/team-user.js" type="text/javascript"></script>
+  <script src="./js/lottie.js" type="text/javascript"></script>
+  <script src="./js/getanimate.js" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      $(".box_content1").animate({ opacity: 1, top: '18px', left: '100px', }, 800);
+      $(".box_content2").animate({ opacity: 1, top: '148px', left: '100px', }, 800);
+      $(".box_content3").animate({ opacity: 1, top: '278px', left: '100px', }, 800);
+      $(".box_content4").animate({ opacity: 1, top: '408px', left: '100px', }, 800);
+      $(".box_content5").animate({ opacity: 1, top: '18px', left: '-24px', }, 800);
+      $(".box_content6").animate({ opacity: 1, top: '148px', left: '-24px', }, 800);
+      $(".box_content7").animate({ opacity: 1, top: '278px', left: '-24px', }, 800);
+      $(".box_content8").animate({ opacity: 1, top: '408px', left: '-24px', }, 800);
+    })
+
+    let bgParams = {//标题背景
+      container: document.getElementById("title_bg"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/bg/data.json"
+    }
+    let bgAnim = lottie.loadAnimation(bgParams);
+
+    let centerImgParams = {//头像
+      container: document.getElementById("center_img_bg"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/center_img/data.json"
+    }
+    let centerImgAnim = lottie.loadAnimation(centerImgParams);
+
+    subtitle = document.getElementsByClassName("subtitle");
+    path = "/resources/screen/expoScreen/animation/subtitle/data.json"
+    for (var i = 0; i < subtitle.length; i++) {
+      let subtitleParams = {//副标题
+        container: subtitle[i],
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: path
+      }
+      let subtitleAnim = lottie.loadAnimation(subtitleParams);
+    }
+
+    $.myAnimate.insideAnimate();
+    $.myAnimate.teamAnimate();
+
+    var stationID1 = GetQueryString("stationID");
+
+    $('#siteZong').on('click', function () {
+      location.href = "./site-overview-inside.html?stationID=" + stationID1 + "&flag=1";
+    })
+    $('#siteGeren').on('click', function () {
+      location.href = "./individual-users-inside.html?stationID=" + stationID1 + "&flag=1";
+    })
+    $('#backIndex').on('click', function () {
+      location.href = "./index.html?page=1";
+    })
+    function GetQueryString(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]);
+      return null;
+    }
+    function changeStation() {
+      var stationID = $("#stationList").val();
+      location.href = "./fleetl-users-inside.html?stationID=" + stationID;
+    }
+
+    setTimeout(function () {
+      $('.part2').css('left', "0");
+      $('.part4').css('left', "0");
+    }, 1000)
+
+  </script>
+
+  <script type="text/javascript">
+    $(".center_nav>ul>li").click(function () {
+      $(this).addClass("active");
+      $(this).siblings().removeClass("active");
+    })
+
+    $(".site_nav>ul>li").click(function () {
+      $(this).addClass("active");
+      $(this).siblings().removeClass("active");
+    })
+
+  </script>
+  <script>
+    var arrData = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
+    function lineChartOptions1111(arrData, data1, data2, data3) {
+      var option = {
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data: ['平', '谷', '峰'],
+          bottom: 0,
+          icon: 'rect',
+          itemWidth: 10,
+          itemHeight: 10,
+          textStyle: {
+            color: '#8BC6FB',
+            fontSize: 12
+          }
+        },
+        grid: {
+          left: 0,
+          right: '10%',
+          bottom: '15%',
+          top: '10%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: arrData,
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            show: false
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#354972'
             }
-            let bgAnim = lottie.loadAnimation(bgParams);
-            
-            let centerImgParams = {//头像
-                container: document.getElementById("center_img_bg"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/center_img/data.json"
+          },
+          axisLabel: {
+            color: '#5E8DCE'
+          }
+        },
+        yAxis: {
+          name: '', nameGap: 0,
+          type: 'value',
+          min: 0,
+          max: 100,
+          interval: 30,
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              type: 'dotted',
+              color: '#1A3A71'
             }
-            let centerImgAnim = lottie.loadAnimation(centerImgParams);
-            
-            subtitle = document.getElementsByClassName("subtitle");
-			path = "/resources/screen/expoScreen/animation/subtitle/data.json"
-			for (var i=0; i< subtitle.length; i++ ){
-				let subtitleParams = {//副标题
-					container: subtitle[i],
-					renderer: "svg",
-					loop: true,
-					autoplay: true,
-					path: path
-				}
-				let subtitleAnim = lottie.loadAnimation(subtitleParams);
-			}
-
-            $.myAnimate.insideAnimate(); 
-            $.myAnimate.teamAnimate(); 
-            
-		    var stationID1 = GetQueryString("stationID");
-     	
-            $('#siteZong').on('click', function() {
-                location.href = "./site-overview-inside.html?stationID=" + stationID1 + "&flag=1";
-            })
-            $('#siteGeren').on('click', function() {
-                location.href = "./individual-users-inside.html?stationID=" + stationID1 + "&flag=1";
-            })
-            $('#backIndex').on('click', function() {
-                location.href = "./index.html?page=1";
-            })
-            function GetQueryString(name) {
-                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-                var r = window.location.search.substr(1).match(reg);
-                if (r != null) return unescape(r[2]);
-                return null;
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#5E8DCE'
             }
-            function changeStation(){
-                var stationID=$("#stationList").val();
-                location.href = "./fleetl-users-inside.html?stationID=" + stationID;
-            }
-            
-            setTimeout(function() {
-                $('.part2').css('left', "0");
-                $('.part4').css('left', "0");
-            }, 1000) 
+          },
+          axisLine: {
+            show: false
+          }
+        },
+        dataZoom: [{
+          type: 'slider',
+          show: false,
+          start: 60,
+          end: 100,
+          handleSize: 15
+        },
+        {
+          type: 'inside',
+          start: 60,
+          end: 100
+        },
+        {
+          type: 'slider',
+          show: false,
+          yAxisIndex: 0,
+          filterMode: 'empty',
+          width: 6,
+          height: '70%',
+          handleSize: 15,
+          showDataShadow: false,
+          left: '93%'
+        }
+        ],
+        series: [
+          {
+            name: '谷',
+            type: 'line',
+            stack: '总量',
+            symbol: 'none',
+            smooth: true,
+            areaStyle: {
+              // origin:'end',
+              normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: 'rgba(244,166,35,0.5)' },
+                  { offset: 1, color: 'rgba(244,166,35,0)' }
+                ])
 
-        </script>
-        
-        <script type="text/javascript">
-            $(".center_nav>ul>li").click(function(){
-                $(this).addClass("active");
-                $(this).siblings().removeClass("active");
-            })
+              }
+            },
+            itemStyle: {
+              color: '#F4A623',
+            },
+            data: data1
+          },
+          {
+            name: '平',
+            type: 'line',
+            stack: '总量',
+            symbol: 'none',
+            smooth: true,
+            areaStyle: {
+              normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: 'rgba(0,162,211,0.5)' },
+                  { offset: 1, color: 'rgba(0,162,211,0)' }
+                ])
+              }
+            },
+            itemStyle: {
+              color: '#00CEF7',
+            },
+            data: data2
+          },
+          {
+            name: '峰',
+            type: 'line',
+            // stack: '总量',
+            symbol: 'none',
+            smooth: true,
+            areaStyle: {
+              normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: 'rgba(254,89,89,0.5)' },
+                  { offset: 1, color: 'rgba(254,89,89,0)' }
+                ])
+              }
+            },
+            itemStyle: {
+              color: '#FE5959',
+            },
+            data: data3
+          }
+        ]
+      };
+      return option;
+    }
 
-            $(".site_nav>ul>li").click(function(){
-                $(this).addClass("active");
-                $(this).siblings().removeClass("active");
-            })     
-            
-        </script>
-        <script>
-            var arrData = [0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30];
-            function lineChartOptions1111(arrData,data1,data2,data3) {
-                var option = {
-               	    tooltip: {
-               	        trigger: 'axis'
-               	    },
-                    legend: {
-                        data:['平','谷','峰'],
-                        bottom:0,
-                        icon:'rect',
-                        itemWidth:10,
-                        itemHeight:10,
-                        textStyle:{
-                            color:'#8BC6FB',
-                            fontSize:12
-                        }
-                    },
-                    grid: {
-                        left: 0,
-                        right: '10%',
-                        bottom: '15%',
-                        top:'10%',
-                        containLabel: true
-                    },
-                    xAxis:{
-                        type: 'category',
-                        boundaryGap: false,
-                        data: arrData,
-                        axisTick:{
-                            show:false
-                        },
-                        splitLine:{
-                            show:false
-                        },
-                        axisLine:{
-                            lineStyle:{
-                                color:'#354972'
-                            }
-                        },
-                        axisLabel:{
-                            color:'#5E8DCE'
-                        }
-                    },
-                    yAxis:{
-                        name : '',nameGap:0,
-                    	type: 'value',
-                        min:0,
-                        max:100,
-                        interval:30,
-                        axisTick:{
-                            show:false
-                        },
-                        splitLine:{
-                            show:true,
-                            lineStyle:{
-                                type:'dotted',
-                                color: '#1A3A71'
-                            }
-                        },
-                        axisLabel:{
-                            textStyle: {
-                                color: '#5E8DCE'
-                            }
-                        },
-                        axisLine:{
-                            show:false
-                        }
-                    },
-                    dataZoom: [{
-                            type: 'slider',
-                            show: false,
-                            start: 60,
-                            end: 100,
-                            handleSize: 15
-                        },
-                        {
-                            type: 'inside',
-                            start: 60,
-                            end: 100
-                        },
-                        {
-                            type: 'slider',
-                            show: false,
-                            yAxisIndex: 0,
-                            filterMode: 'empty',
-                            width: 6,
-                            height: '70%',
-                            handleSize: 15,
-                            showDataShadow: false,
-                            left: '93%'
-                        }
-                    ],
-                    series : [
-                        {
-                            name:'谷',
-                            type:'line',
-                            stack: '总量',
-                            symbol:'none',
-                            smooth:true,
-                            areaStyle:{
-                                // origin:'end',
-                                normal: {
-                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                        {offset: 0,color: 'rgba(244,166,35,0.5)'}, 
-                                        {offset: 1,color: 'rgba(244,166,35,0)'}
-                                    ])
+    var fleetArr1 = [20, 28, 27, 26, 28, 32, 34, 28, 22, 20, 24, 30, 34, 31, 25, 36];
+    var fleetArr2 = [1, 4, 3, 6, 10, 4, 6, 16, 10, 8, 12, 14, 16, 18, 20, 22];			//车队峰平谷分析数据
+    var fleetArr3 = [1, 1, 22, 41, 56, 28, 40, 64, 44, 40, 41, 66, 84, 68, 62, 30];
+    var line1 = echarts.init(document.getElementById("analysis"));
+    line1.setOption(lineChartOptions1111(arrData, fleetArr1, fleetArr2, fleetArr3));   //车队峰平谷分析  
+  </script>
+</body>
 
-                                } 
-                            },
-                            itemStyle:{
-                                color:'#F4A623',
-                            },
-                            data:data1
-                        },
-                        {
-                            name:'平',
-                            type:'line',
-                            stack: '总量',
-                            symbol:'none',
-                            smooth:true,
-                            areaStyle:{
-                                normal: {
-                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1,[
-                                        {offset: 0, color: 'rgba(0,162,211,0.5)'},
-                                        {offset: 1, color: 'rgba(0,162,211,0)'}
-                                    ])
-                                }
-                            },
-                            itemStyle:{
-                                color:'#00CEF7',
-                            },
-                            data:data2
-                        },
-                        {
-                            name:'峰',
-                            type:'line',
-                            // stack: '总量',
-                            symbol:'none',
-                            smooth:true,
-                            areaStyle:{
-                                normal: {
-                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1,[
-                                        {offset: 0, color: 'rgba(254,89,89,0.5)'},
-                                        {offset: 1, color: 'rgba(254,89,89,0)'}
-                                    ])
-                                }
-                            },
-                            itemStyle:{
-                                color:'#FE5959',
-                            },
-                            data:data3
-                        }
-                    ]
-                };
-                return option;
-            }
-
-            var fleetArr1 = [20,28,27,26,28,32,34,28,22,20,24,30,34,31,25,36];
-            var fleetArr2 = [1,4,3,6,10,4,6,16,10,8,12,14,16,18,20,22];			//车队峰平谷分析数据
-            var fleetArr3 = [1,1,22,41,56,28,40,64,44,40,41,66,84,68,62,30];
-            var line1 = echarts.init(document.getElementById("analysis"));    
-            line1.setOption(lineChartOptions1111(arrData,fleetArr1,fleetArr2,fleetArr3));   //车队峰平谷分析  
-        </script>
-    </body>
 </html>

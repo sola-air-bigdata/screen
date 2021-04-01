@@ -199,7 +199,7 @@ body::-webkit-scrollbar-thumb{
     /* background: url('../img/center-tab.png') no-repeat; */
     background-size: 100% 100%;
     position:absolute;
-    bottom:12px;
+    bottom:-100px;
     left: 118px;
     width: 580px;
 }

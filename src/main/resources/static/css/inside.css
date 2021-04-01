@@ -20,7 +20,7 @@ body {
 }
 
 .main {
-    width: 1920px;
+    /* width: 1920px; */
     height: 100%;
     padding: 50px 30px;
     position: relative;
