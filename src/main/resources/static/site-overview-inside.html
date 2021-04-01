@@ -1,657 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="ie=edge" http-equiv="X-UA-Compatible">
-    <title>广州公交新能源-如约充电-站点总览内页</title>
-    <link href="./css/inside.css" rel="stylesheet">
-    <link href="./css/site-center.css" rel="stylesheet">
-    <style>
-        .charge_data li {
-            height: 60px;
-        }
-        .charge_data .circle {
-            margin-top: 22px;
-        }
-        #canvas1 {
-            padding: 0;
-            margin: 0;
-            position: absolute;
-            z-index: 0;
-            left: 0;
-        }
-        #canvas {
-			width:1184px; 
-			height:458px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="ie=edge" http-equiv="X-UA-Compatible">
+  <title>广州公交新能源-如约充电-站点总览内页</title>
+  <link href="./css/inside.css" rel="stylesheet">
+  <link href="./css/site-center.css" rel="stylesheet">
+  <style>
+    .charge_data li {
+      height: 60px;
+    }
+
+    .charge_data .circle {
+      margin-top: 22px;
+    }
+
+    #canvas1 {
+      padding: 0;
+      margin: 0;
+      position: absolute;
+      z-index: 0;
+      left: 0;
+    }
+
+    #canvas {
+      width: 1184px;
+      height: 458px;
+    }
+  </style>
 </head>
+
 <body class="scaled">
-    <div class="main">
-        <time id="time"></time>
-        <div id="title_bg" style="position: absolute;top:-7px;left:536px;z-index:9999;"></div>
+  <div class="main">
+    <time id="time"></time>
+    <div id="title_bg" style="width:1651px; height: 117px; position: absolute;top:-7px;left:136px;z-index:9999;"></div>
 
-		<div style="height: 450px;width: 1850px;">
-			<div class="part part1">
-				<section class="inside inside1">
-					<div class="station_title">
-						<div class="station_circle fl" id="backIndex"></div>
-						<h1 style="padding-top:10px;margin-left:20px;display: inline-block;" id="r_stationName"></h1>
-						<div class="station_select">
-							<select class="form_select" id="stationList" onchange="changeStation();">
-							</select>
-						</div>
-					</div>
-					<div class="station_content mt40" style="height: 270px;">
-						<div class="fl station_img">
-							<img src="./img/map1.png" alt="" id="s_stationImage">
-						</div>
-						<div class="fl station_text">
-							<h1 style="font-weight:500;" id="s_stationName"><span class="mc_2bd fs_20"> 对外</span></h1>
-							<div class="mt20">
-								<span class="mc_8bc fs_20">桩数:<span style="color:#fff;font-size: 40px;" id="s_stationPile" class="myfont"> 0</span></span>
-								<ul class="station_list">
-									<li style="width:30%;border-right:none;background: rgba(0, 255, 123, 0.5);">快</li>
-									<li style="width:66%;background: rgba(0, 255, 123, 0.3);" id="s_free">0</li>
-								</ul>
-								<span class="mc_2bd"><span style="font-size:26px;" id="s_electricityPrice">1.20</span>元/度</span>
-							</div>
-							<div class="mc_8bc" style="margin-top: 10px;">地址：<span id="s_stationaddres"></span></div>
-							<div class="mc_8bc" style="margin-top: 10px;">评分：<div id="star_grade" style="display:inline-block;"></div></div>
-						</div>
-					</div>
-				</section>
-				<section class="inside inside2">
-					<div style="margin-top: 26px;">
-						<ul class="service_times">
-							<li>
-								<div id="total_num" class="animate_inside"></div>
-								<p class="mc_8bc" style="margin-top:4px;" id="serviceDw">总充电数(次)</p>
-								<p><span><span style="font-size:40px;" id="s_monthServicesNums" class="myfont">0</span></span></p>
-							</li>
-							<li>
-								<div id="total_quantity" class="animate_inside"></div>
-								<p class="mc_8bc" style="margin-top:4px;" id="isWan">总充电(KWH)</p>
-								<p><span style="font-size:40px;" id="s_monthTotalPower" class="myfont">0</span></p>
-							</li>
-							<li>
-								<div id="total_income" class="animate_inside"></div>
-								<p class="mc_8bc" style="margin-top:4px;" id="incomeDw">累计收入(元)</p>
-								<p><span style="font-size:40px;" class="myfont" id="s_monthTotalRevenue">0</span></p>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="inside inside3">
-					<div class="subtitle">
-						<h1 style="top: 28px;font-size:20px;">站充电设备</h1>
-					</div>
-					<ul class="station_device_info">
-						<li>
-							<img class="fl" src="./img/overview-9.png" alt="">
-							<span class="mc_8bc power">设备总功率</span>
-							<span id="s_totalPowerOfEquipment"><span style="font-size:40px;" class="myfont">0</span> KW</span>
-						</li>
-						<li>
-							<img class="fl" src="./img/overview-10.png" alt="">
-							<span class="mc_8bc power">变压功率</span>
-							<span  id="s_variableVoltagePower"><span style="font-size:40px;" class="myfont">0</span> KW</span>
-						</li>
-						<li>
-							<img class="fl" src="./img/overview-11.png" alt="">
-							<span class="mc_8bc power">充电电能</span>
-							<span id="s_chargingEnergy"><span style="font-size:40px;" class="myfont">0</span> KWH</span>
-						</li>
-					</ul>
-				</section>
-				<section class="inside inside4">
-					<div class="subtitle">
-						<h1 style="top: 28px;font-size:20px;">时段充电汇总</h1>
-					</div>
-					<div>
-						<div class="fl" style="width:168px;height: 200px;">
-							<img src="./img/peak.gif" alt="" style="width:90%;margin-top:32px;border-radius:50%;">
-						</div>
-						<div class="charge_data mt20" style="padding-top:4px;">
-							<ul>
-								<li>
-									<div class="circle circle1"></div>
-									<span class="mc_8bc">尖</span>
-									<span class="mc_fff"  id="s_jianCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-								</li>
-								<li>
-									<div class="circle circle2"></div>
-									<span class="mc_8bc">峰</span>
-									<span class="mc_fff"  id="s_fengCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-								</li>
-								<li>
-									<div class="circle circle3"></div>
-									<span class="mc_8bc">平</span>
-									<span class="mc_fff"  id="s_pingCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-								</li>
-								<li>
-									<div class="circle circle4"></div>
-									<span class="mc_8bc">谷</span>
-									<span class="mc_fff"  id="s_guCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
-								</li>
-							</ul> 
-						</div> 
-					</div>
-				</section>
-			</div>
-		</div>
+    <div style="height: 450px;width: 1850px;">
+      <div class="part part1">
+        <section class="inside inside1">
+          <div class="station_title">
+            <div class="station_circle fl" id="backIndex"></div>
+            <h1 style="padding-top:10px;margin-left:20px;display: inline-block;" id="r_stationName"></h1>
+            <div class="station_select">
+              <select class="form_select" id="stationList" onchange="changeStation();">
+              </select>
+            </div>
+          </div>
+          <div class="station_content mt40" style="height: 270px;">
+            <div class="fl station_img">
+              <img src="./img/map1.png" alt="" id="s_stationImage">
+            </div>
+            <div class="fl station_text">
+              <h1 style="font-weight:500;" id="s_stationName"><span class="mc_2bd fs_20"> 对外</span></h1>
+              <div class="mt20">
+                <span class="mc_8bc fs_20">桩数:<span style="color:#fff;font-size: 40px;" id="s_stationPile"
+                    class="myfont"> 0</span></span>
+                <ul class="station_list">
+                  <li style="width:30%;border-right:none;background: rgba(0, 255, 123, 0.5);">快</li>
+                  <li style="width:66%;background: rgba(0, 255, 123, 0.3);" id="s_free">0</li>
+                </ul>
+                <span class="mc_2bd"><span style="font-size:26px;" id="s_electricityPrice">1.20</span>元/度</span>
+              </div>
+              <div class="mc_8bc" style="margin-top: 10px;">地址：<span id="s_stationaddres"></span></div>
+              <div class="mc_8bc" style="margin-top: 10px;">评分：<div id="star_grade" style="display:inline-block;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="inside inside2">
+          <div style="margin-top: 26px;">
+            <ul class="service_times">
+              <li>
+                <div id="total_num" class="animate_inside"></div>
+                <p class="mc_8bc" style="margin-top:4px;" id="serviceDw">总充电数(次)</p>
+                <p><span><span style="font-size:40px;" id="s_monthServicesNums" class="myfont">0</span></span></p>
+              </li>
+              <li>
+                <div id="total_quantity" class="animate_inside"></div>
+                <p class="mc_8bc" style="margin-top:4px;" id="isWan">总充电(KWH)</p>
+                <p><span style="font-size:40px;" id="s_monthTotalPower" class="myfont">0</span></p>
+              </li>
+              <li>
+                <div id="total_income" class="animate_inside"></div>
+                <p class="mc_8bc" style="margin-top:4px;" id="incomeDw">累计收入(元)</p>
+                <p><span style="font-size:40px;" class="myfont" id="s_monthTotalRevenue">0</span></p>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section class="inside inside3">
+          <div class="subtitle">
+            <h1 style="top: 28px;font-size:20px;">站充电设备</h1>
+          </div>
+          <ul class="station_device_info">
+            <li>
+              <img class="fl" src="./img/overview-9.png" alt="">
+              <span class="mc_8bc power">设备总功率</span>
+              <span id="s_totalPowerOfEquipment"><span style="font-size:40px;" class="myfont">0</span> KW</span>
+            </li>
+            <li>
+              <img class="fl" src="./img/overview-10.png" alt="">
+              <span class="mc_8bc power">变压功率</span>
+              <span id="s_variableVoltagePower"><span style="font-size:40px;" class="myfont">0</span> KW</span>
+            </li>
+            <li>
+              <img class="fl" src="./img/overview-11.png" alt="">
+              <span class="mc_8bc power">充电电能</span>
+              <span id="s_chargingEnergy"><span style="font-size:40px;" class="myfont">0</span> KWH</span>
+            </li>
+          </ul>
+        </section>
+        <section class="inside inside4">
+          <div class="subtitle">
+            <h1 style="top: 28px;font-size:20px;">时段充电汇总</h1>
+          </div>
+          <div>
+            <div class="fl" style="width:168px;height: 200px;">
+              <img src="./img/peak.gif" alt="" style="width:90%;margin-top:32px;border-radius:50%;">
+            </div>
+            <div class="charge_data mt20" style="padding-top:4px;">
+              <ul>
+                <li>
+                  <div class="circle circle1"></div>
+                  <span class="mc_8bc">尖</span>
+                  <span class="mc_fff" id="s_jianCharge"><span class="myfont"
+                      style="font-size: 36px;">0</span>kwh</span>
+                </li>
+                <li>
+                  <div class="circle circle2"></div>
+                  <span class="mc_8bc">峰</span>
+                  <span class="mc_fff" id="s_fengCharge"><span class="myfont"
+                      style="font-size: 36px;">0</span>kwh</span>
+                </li>
+                <li>
+                  <div class="circle circle3"></div>
+                  <span class="mc_8bc">平</span>
+                  <span class="mc_fff" id="s_pingCharge"><span class="myfont"
+                      style="font-size: 36px;">0</span>kwh</span>
+                </li>
+                <li>
+                  <div class="circle circle4"></div>
+                  <span class="mc_8bc">谷</span>
+                  <span class="mc_fff" id="s_guCharge"><span class="myfont" style="font-size: 36px;">0</span>kwh</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
 
 
-		<div style="height: 530px;width: 1850px;">
-			<div class="part part2">
-				<section class="inside fl">
-					<div class="inside_title">
-						<div id="charging_log" class="fleet_animate"></div>
-						<h1>服务日志</h1>
-					</div>
-					<!-- <div class="mt20 charging_log">
+    <div style="height: 642px;width: 100%;">
+      <div class="part part2">
+        <section class="inside fl">
+          <div class="inside_title">
+            <div id="charging_log" class="fleet_animate"></div>
+            <h1>服务日志</h1>
+          </div>
+          <!-- <div class="mt20 charging_log">
 						<ul style="height:470px;overflow:scroll;" id="charging_log_ul"></ul>
 						<div class="line"> 
 						</div>
 					</div> -->
 
-					<div class="mt20 charging_log">
-						<ul id="chargingLog" style="height:470px;overflow:scroll;"></ul>
-						<div class="line">
-						</div>
-					</div>
+          <div class="mt20 charging_log">
+            <ul id="chargingLog" style="height:470px;overflow:scroll;"></ul>
+            <div class="line">
+            </div>
+          </div>
 
-				</section>
-			</div>
-			<div class="part part3">
-				<div class="site_nav">
-					<ul>
-						<li id="siteZong">
-							<img src="./img/nav-overview.png" alt="" style="left:3px;">
-							<p>站点总览</p>
-						</li>
-						<li class="active">
-							<img src="./img/nav-users-1.png" alt="">
-							<p>站点用户</p> 
-						</li>
-					</ul>
-				</div>
-				<div id="canvas1">
-					<div id="canvas"></div>
-				</div>
-				<div class="start_up1" id="start_up1" style="left: 50%; margin-left: -230px">
-					<img alt="" src="./img/start_up.png">
-					<span style="margin-left:42px;">
-						一键启动
-					</span>
-				</div>
-				
-				<div class="start_up dis_none" id="start_up"  style="left: 50%; margin-left: -450px">
-					<ul>
-						<li style="text-align: right;width: 52%;">
-							<img alt="" class="close" id="close" src="./img/close.png" width="28">
-							<p>
-								已选充电枪：
-								<span id="checkedimg">0</span>个
-							</p>
-							<div class="line"></div>
-						</li>
-						<li style="text-align: left;width: 48%;">
-							<img alt="" class="checkbox" id="c_box" src="./img/box_normal.png">
-							<input id="" name="" type="checkbox">
-							<span style="margin-left:28px;">
-									全选
-								</span>
-							<button id="qidongBtn">
-								启动
-							</button>
-						</li>
-					</ul>
-				</div>
-				<section class="site_center site_center1 fl" style="padding-top: 20px;padding-left: 45px;">
-					<div class="center_title">
-						<div id="total_guns" class="fleet_animate" style="width: 52px;height:52px;left:82px;"></div>
-						<h1>
-							充电枪数
-						</h1>
-					</div>
-					<div style="margin-top: 20px;">
-						<span id="siteGunCount" style="font-size:42px;" class="myfont">
-							0
-						</span>
-						个
-					</div>
-					<div class="build">
-						<img alt="" src="./img/center2.png" width="36">
-						<p>
-							充电
-							<span id="sitecharging" style="font-size:32px;" class="myfont">
-								0
-							</span>
-						</p>
-					</div>
-					<div class="build mt20">
-						<img alt="" src="./img/center1.png" width="36">
-						<p>
-							故障
-							<span id="siteproblem" style="font-size:32px;" class="myfont">
-								0
-							</span>
-						</p>
-					</div>
-					<div class="build mt20">
-						<img alt="" src="./img/8.png" width="36">
-						<p>
-							离线
-							<span id="siteoffLine" style="font-size:32px;" class="myfont">
-								0
-							</span>
-						</p>
-					</div>
-					<div class="build mt20">
-						<img alt="" src="./img/center3.png" width="36">
-						<p>
-							充满
-							<span id="sitechargeFinsh" style="font-size:32px;" class="myfont">
-								0
-							</span>
-						</p>
-					</div>
-					<div class="mc_8bc" style="font-size:18px;margin-top: 10px;">
-						实时功率
-						<span class="mc_fff myfont realTimePower1" id="realTimePower" style="font-size:32px;">
-						</span>
-						kw
-					</div>
-					<div id="time_power" style="height:200px;width:100%">
-					</div>
-				</section>
-				<section class="site_center site_center2 fl" style="z-index: -999;">
-					<div class="center_gun" style="display: none">
-						<div class="gun_top">
-							<ul id="gunlist"></ul>
-						</div>
-					</div>
-					<div class="start_up dis_none" id="start_up" style="display: none">
-						<ul>
-							<li style="text-align: right;width: 52%;">
-								<img alt="" class="close" id="close" src="./img/close.png" width="28">
-								<p>
-									已选充电枪：
-									<span id="checkedimg">
-										0
-									</span>
-									个
-								</p>
-								<div class="line">
-								</div>
-							</li>
-							<li style="text-align: left;width: 48%;">
-								<img alt="" class="checkbox" id="c_box" src="./img/box_normal.png">
-								<input id="" name="" type="checkbox">
-								<span style="margin-left:28px;">
-									全选
-								</span>
-								<button id="qidongBtn">
-									启动
-								</button>
-							</li>
-						</ul>
-					</div>
-					<div class="start_up1" id="start_up1" style="display: none">
-						<img alt="" src="./img/start_up.png">
-						<span style="margin-left:42px;">
-							一键启动
-						</span>
-					</div>
-					<div id="gunde" style="display: none">
-					</div>
-				</section>
-				<section class="site_center site_center3 fl" style="padding-top: 20px;">
-					<div class="charging_gun">
-						<div>
-							<img alt="" src="./img/gun3.png">
-						</div>
-						<p>
-							准备
-							<span id="sitechargePrepare" style="color:#29D07F;border:1px solid #29D07F;background:rgba(41, 208, 127, 0.3);">
-								0
-							</span>
-						</p>
-					</div>
-					<div class="charging_gun mt36">
-						<div>
-							<img alt="" src="./img/gun4.png">
-						</div>
-						<p>
-							预约
-							<span id="sitebespeak" style="color:#49B5FF;border:1px solid #49B5FF;background:rgba(73, 181, 255, 0.3);">
-								0
-							</span>
-						</p>
-					</div>
-					<div class="charging_gun mt36">
-						<div>
-							<img alt="" src="./img/gun5.png">
-						</div>
-						<p>
-							充电
-						</p>
-					</div>
-					<div class="charging_gun mt36">
-						<div>
-							<img alt="" src="./img/gun6.png">
-						</div>
-						<p>
-							充满
-						</p>
-					</div>
-					<div class="charging_gun mt36">
-						<div>
-							<img alt="" src="./img/gun7.png">
-						</div>
-						<p>
-							空闲
-						</p>
-					</div>
-					<div class="charging_gun mt36">
-						<div>
-							<img alt="" src="./img/gun8.png">
-						</div>
-						<p>
-							告警
-						</p>
-					</div>
-					<div class="charging_gun mt36">
-						<div>
-							<img alt="" src="./img/gun9.png">
-						</div>
-						<p>
-							离线
-						</p>
-					</div>
-				</section>
-				<div class="site_nav">
-					<ul>
-						<li class="active" id="siteZong">
-							<img alt="" src="./img/nav-overview-1.png" style="left:3px;">
-							<p>
-								站点总览
-							</p>
-						</li>
-						<li id="siteYong">
-							<img alt="" src="./img/nav-users.png">
-							<p>
-								站点用户
-							</p>
-						</li>
-					</ul>
-				</div>
-			</div>
-			<div class="part part4">
-				<section class="inside fr" style="width: 100%;">
-					<div class="inside_title">
-						<div id="site_operation" class="fleet_animate"></div>
-						<h1>今日运营信息</h1>
-					</div>
-					<div class="mt20 site_operation" style="height:84px;">
-						<ul>
-							<li>
-								<p>
-									充电量
-									<span id="todayTotalPowerDw">(kwh)</span>
-								</p>
-								<p>
-									<span class="fs_32 myfont" id="todayTotalPower">0</span>
-								</p>
-							</li>
-							<li>
-								<p>
-									收入
-									<span id="todayTotalRevenueDw">(元)</span>
-								</p>
-								<p>
-									<span class="fs_32 myfont" id="todayTotalRevenue">0</span>
-								</p>
-							</li>
-							<li>
-								<p>
-									订单
-									<span>(个)</span>
-								</p>
-								<p>
-									<span class="fs_32 myfont" id="todayServicesNums"></span>
-								</p>
-							</li>
-						</ul>
-					</div>
-					<div class="service_vehicle" style="height: 27px;">
-						<div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-20px;">
-							<h1>今日服务车辆</h1>
-						</div> 
-					</div>
-					<div id="service_vehicle" style="height:130px;width:96%;margin: 2%;">
-					</div>
-					<div class="service_vehicle" style="height: 12px;">
-						<div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-48px;">
-							<h1>月站场运营</h1>
-						</div>
-					</div>
-					<div class="site_operation" style="height:44px;">
-						<ul>
-							<li>
-								<p>
-									充电量<span id="monthTotalPowerDw">(kwh)</span>
-								</p>
-								<p>
-									<span class="fs_32 myfont" id="monthTotalPower">0</span>
-								</p>
-							</li>
-							<li>
-								<p>收入<span id="monthTotalRevenueDw">(元)</span></p>
-								<p><span class="fs_32 myfont" id="monthTotalRevenue">0</span></p>
-							</li>
-							<li>
-								<p>
-									订单<span id="monthServicesNumsDw">(个)</span>
-								</p>
-								<p>
-									<span class="fs_32 myfont" id="monthServicesNums">0</span>
-								</p>
-							</li>
-						</ul>
-					</div>
-					<div id="station_operation" style="height:130px;width:100%;width:96%;margin: 2%;">
-					</div>
-				</section>
-			</div>
-		</div>
-		<div style="position:absolute;left:0;top:9px;">
-			<img src="./img/left.png" alt="">
-		</div>
-		<div style="position:absolute;right:0px;top:9px;">
-			<img src="./img/right.png" alt="">
-		</div>
-		<div style="position:absolute;left:62px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
-		<div style="position:absolute;right:54px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
-		<div style="position:absolute;left:62px;bottom:18px;width: 1806px;height: 2px;background: #256CF9;z-index:9999;"></div>
+        </section>
+      </div>
+      <div class="part part3">
+        <div class="site_nav">
+          <ul>
+            <li id="siteZong">
+              <img src="./img/nav-overview.png" alt="" style="left:3px;">
+              <p>站点总览</p>
+            </li>
+            <li class="active">
+              <img src="./img/nav-users-1.png" alt="">
+              <p>站点用户</p>
+            </li>
+          </ul>
+        </div>
+        <div id="canvas1">
+          <div id="canvas"></div>
+        </div>
+        <div class="start_up1" id="start_up1" style="left: 50%; margin-left: -230px">
+          <img alt="" src="./img/start_up.png">
+          <span style="margin-left:42px;">
+            一键启动
+          </span>
+        </div>
+
+        <div class="start_up dis_none" id="start_up" style="left: 50%; margin-left: -450px">
+          <ul>
+            <li style="text-align: right;width: 52%;">
+              <img alt="" class="close" id="close" src="./img/close.png" width="28">
+              <p>
+                已选充电枪：
+                <span id="checkedimg">0</span>个
+              </p>
+              <div class="line"></div>
+            </li>
+            <li style="text-align: left;width: 48%;">
+              <img alt="" class="checkbox" id="c_box" src="./img/box_normal.png">
+              <input id="" name="" type="checkbox">
+              <span style="margin-left:28px;">
+                全选
+              </span>
+              <button id="qidongBtn">
+                启动
+              </button>
+            </li>
+          </ul>
+        </div>
+        <section class="site_center site_center1 fl" style="padding-top: 20px;padding-left: 45px;">
+          <div class="center_title">
+            <div id="total_guns" class="fleet_animate" style="width: 52px;height:52px;left:82px;"></div>
+            <h1>
+              充电枪数
+            </h1>
+          </div>
+          <div style="margin-top: 20px;">
+            <span id="siteGunCount" style="font-size:42px;" class="myfont">
+              0
+            </span>
+            个
+          </div>
+          <div class="build">
+            <img alt="" src="./img/center2.png" width="36">
+            <p>
+              充电
+              <span id="sitecharging" style="font-size:32px;" class="myfont">
+                0
+              </span>
+            </p>
+          </div>
+          <div class="build mt20">
+            <img alt="" src="./img/center1.png" width="36">
+            <p>
+              故障
+              <span id="siteproblem" style="font-size:32px;" class="myfont">
+                0
+              </span>
+            </p>
+          </div>
+          <div class="build mt20">
+            <img alt="" src="./img/8.png" width="36">
+            <p>
+              离线
+              <span id="siteoffLine" style="font-size:32px;" class="myfont">
+                0
+              </span>
+            </p>
+          </div>
+          <div class="build mt20">
+            <img alt="" src="./img/center3.png" width="36">
+            <p>
+              充满
+              <span id="sitechargeFinsh" style="font-size:32px;" class="myfont">
+                0
+              </span>
+            </p>
+          </div>
+          <div class="mc_8bc" style="font-size:18px;margin-top: 10px;">
+            实时功率
+            <span class="mc_fff myfont realTimePower1" id="realTimePower" style="font-size:32px;">
+            </span>
+            kw
+          </div>
+          <div id="time_power" style="height:200px;width:100%">
+          </div>
+        </section>
+        <section class="site_center site_center2 fl" style="z-index: -999;">
+          <div class="center_gun" style="display: none">
+            <div class="gun_top">
+              <ul id="gunlist"></ul>
+            </div>
+          </div>
+          <div class="start_up dis_none" id="start_up" style="display: none">
+            <ul>
+              <li style="text-align: right;width: 52%;">
+                <img alt="" class="close" id="close" src="./img/close.png" width="28">
+                <p>
+                  已选充电枪：
+                  <span id="checkedimg">
+                    0
+                  </span>
+                  个
+                </p>
+                <div class="line">
+                </div>
+              </li>
+              <li style="text-align: left;width: 48%;">
+                <img alt="" class="checkbox" id="c_box" src="./img/box_normal.png">
+                <input id="" name="" type="checkbox">
+                <span style="margin-left:28px;">
+                  全选
+                </span>
+                <button id="qidongBtn">
+                  启动
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="start_up1" id="start_up1" style="display: none">
+            <img alt="" src="./img/start_up.png">
+            <span style="margin-left:42px;">
+              一键启动
+            </span>
+          </div>
+          <div id="gunde" style="display: none">
+          </div>
+        </section>
+        <section class="site_center site_center3 fl" style="padding-top: 20px;">
+          <div class="charging_gun">
+            <div>
+              <img alt="" src="./img/gun3.png">
+            </div>
+            <p>
+              准备
+              <span id="sitechargePrepare"
+                style="color:#29D07F;border:1px solid #29D07F;background:rgba(41, 208, 127, 0.3);">
+                0
+              </span>
+            </p>
+          </div>
+          <div class="charging_gun mt36">
+            <div>
+              <img alt="" src="./img/gun4.png">
+            </div>
+            <p>
+              预约
+              <span id="sitebespeak" style="color:#49B5FF;border:1px solid #49B5FF;background:rgba(73, 181, 255, 0.3);">
+                0
+              </span>
+            </p>
+          </div>
+          <div class="charging_gun mt36">
+            <div>
+              <img alt="" src="./img/gun5.png">
+            </div>
+            <p>
+              充电
+            </p>
+          </div>
+          <div class="charging_gun mt36">
+            <div>
+              <img alt="" src="./img/gun6.png">
+            </div>
+            <p>
+              充满
+            </p>
+          </div>
+          <div class="charging_gun mt36">
+            <div>
+              <img alt="" src="./img/gun7.png">
+            </div>
+            <p>
+              空闲
+            </p>
+          </div>
+          <div class="charging_gun mt36">
+            <div>
+              <img alt="" src="./img/gun8.png">
+            </div>
+            <p>
+              告警
+            </p>
+          </div>
+          <div class="charging_gun mt36">
+            <div>
+              <img alt="" src="./img/gun9.png">
+            </div>
+            <p>
+              离线
+            </p>
+          </div>
+        </section>
+        <div class="site_nav">
+          <ul>
+            <li class="active" id="siteZong">
+              <img alt="" src="./img/nav-overview-1.png" style="left:3px;">
+              <p>
+                站点总览
+              </p>
+            </li>
+            <li id="siteYong">
+              <img alt="" src="./img/nav-users.png">
+              <p>
+                站点用户
+              </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="part part4">
+        <section class="inside fr" style="width: 100%;">
+          <div class="inside_title">
+            <div id="site_operation" class="fleet_animate"></div>
+            <h1>今日运营信息</h1>
+          </div>
+          <div class="mt20 site_operation" style="height:84px;">
+            <ul>
+              <li>
+                <p>
+                  充电量
+                  <span id="todayTotalPowerDw">(kwh)</span>
+                </p>
+                <p>
+                  <span class="fs_32 myfont" id="todayTotalPower">0</span>
+                </p>
+              </li>
+              <li>
+                <p>
+                  收入
+                  <span id="todayTotalRevenueDw">(元)</span>
+                </p>
+                <p>
+                  <span class="fs_32 myfont" id="todayTotalRevenue">0</span>
+                </p>
+              </li>
+              <li>
+                <p>
+                  订单
+                  <span>(个)</span>
+                </p>
+                <p>
+                  <span class="fs_32 myfont" id="todayServicesNums"></span>
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="service_vehicle" style="height: 27px;">
+            <div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-20px;">
+              <h1>今日服务车辆</h1>
+            </div>
+          </div>
+          <div id="service_vehicle" style="height:130px;width:96%;margin: 2%;">
+          </div>
+          <div class="service_vehicle" style="height: 12px;">
+            <div class="subtitle" style="width: 90%;margin: 0 5%;position: relative;top:-48px;">
+              <h1>月站场运营</h1>
+            </div>
+          </div>
+          <div class="site_operation" style="height:44px;">
+            <ul>
+              <li>
+                <p>
+                  充电量<span id="monthTotalPowerDw">(kwh)</span>
+                </p>
+                <p>
+                  <span class="fs_32 myfont" id="monthTotalPower">0</span>
+                </p>
+              </li>
+              <li>
+                <p>收入<span id="monthTotalRevenueDw">(元)</span></p>
+                <p><span class="fs_32 myfont" id="monthTotalRevenue">0</span></p>
+              </li>
+              <li>
+                <p>
+                  订单<span id="monthServicesNumsDw">(个)</span>
+                </p>
+                <p>
+                  <span class="fs_32 myfont" id="monthServicesNums">0</span>
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div id="station_operation" style="height:130px;width:100%;width:96%;margin: 2%;">
+          </div>
+        </section>
+      </div>
     </div>
+    <div style="position:absolute;left:0;top:9px;">
+      <img style="display: block;height: 1136px;" src="./img/left.png" alt="">
+    </div>
+    <div style="position:absolute;right:0px;top:9px;">
+      <img style="display: block;height: 1136px;" src="./img/right.png" alt="">
+    </div>
+    <div style="position:absolute;left:62px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
+    <div style="position:absolute;right:54px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
+    <div style="position:absolute;left:62px;bottom:18px;width: 1806px;height: 2px;background: #256CF9;z-index:9999;">
+    </div>
+  </div>
 
-    <script src="./js/jquery.min.js" type="text/javascript"></script>
-    <script src="./js/echarts.min.js" type="text/javascript"></script>
-    <script defer="" src="./js/clock.js" type="text/javascript"></script>
-    <script src="./js/markingSystem.js" type="text/javascript"></script>
-    <script src="./js/TweenLite.min.js" type="text/javascript"></script>
-    <script src="./js/lem_counter.js" type="text/javascript"></script>
-    <script defer="" src="./js/stationInfo.js" type="text/javascript"></script>
-    <script type="text/javascript" src="/resources/js/layer/layer.js"></script>
-    <script charset="utf-8" src="./js/getsiteInside.js" type="text/javascript"></script>
-    <script src="./js/lottie.js" type="text/javascript"></script>
-	<script src="./js/getanimate.js" type="text/javascript" charset="utf-8"></script>
-	<!-- <script src="./js/daily.js" type="text/javascript"></script> -->
+  <script src="./js/jquery.min.js" type="text/javascript"></script>
+  <script src="./js/echarts.min.js" type="text/javascript"></script>
+  <script defer="" src="./js/clock.js" type="text/javascript"></script>
+  <script src="./js/markingSystem.js" type="text/javascript"></script>
+  <script src="./js/TweenLite.min.js" type="text/javascript"></script>
+  <script src="./js/lem_counter.js" type="text/javascript"></script>
+  <script defer="" src="./js/stationInfo.js" type="text/javascript"></script>
+  <script type="text/javascript" src="/resources/js/layer/layer.js"></script>
+  <script charset="utf-8" src="./js/getsiteInside.js" type="text/javascript"></script>
+  <script src="./js/lottie.js" type="text/javascript"></script>
+  <script src="./js/getanimate.js" type="text/javascript" charset="utf-8"></script>
+  <!-- <script src="./js/daily.js" type="text/javascript"></script> -->
 
-    <script src="/resources/screen/expoScreen/animation/3djs/three.min.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/stats.min.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/WebGL.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/OrbitControls.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/ThreeBSP.js"></script> 
-    <script src="/resources/screen/expoScreen/animation/3djs/Tween.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/THREEx.KeyboardState.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/THREEx.FullScreen.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/THREEx.WindowResize.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/LegacyJSONLoader.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/gunmodel.js"></script>
-    <script src="/resources/screen/expoScreen/animation/3djs/init.js"></script>
-    <script>
-        var mapsize = {}
-        var gunlist = []
-        function popPile(pid) {
-            // alert(pid)
+  <script src="/resources/screen/expoScreen/animation/3djs/three.min.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/stats.min.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/WebGL.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/OrbitControls.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/ThreeBSP.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/Tween.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/THREEx.KeyboardState.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/THREEx.FullScreen.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/THREEx.WindowResize.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/LegacyJSONLoader.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/gunmodel.js"></script>
+  <script src="/resources/screen/expoScreen/animation/3djs/init.js"></script>
+  <script>
+    var mapsize = {}
+    var gunlist = []
+    function popPile(pid) {
+      // alert(pid)
+    }
+  </script>
+
+  <script type="text/javascript">
+    function changeStation() {
+      var stationID = $("#stationList").val();
+      location.href = "./site-overview-inside.html?stationID=" + stationID;
+    }
+    let bgParams = {//标题背景
+      container: document.getElementById("title_bg"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/bg/data.json"
+    }
+    let bgAnim = lottie.loadAnimation(bgParams);
+
+    subtitle = document.getElementsByClassName("subtitle");
+    path = "/resources/screen/expoScreen/animation/subtitle/data.json"
+    for (var i = 0; i < subtitle.length; i++) {
+      let subtitleParams = {//副标题
+        container: subtitle[i],
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: path
+      }
+      let subtitleAnim = lottie.loadAnimation(subtitleParams);
+    }
+  </script>
+
+  <script type="text/javascript">
+    $.myAnimate.insideAnimate();
+    $.myAnimate.overviewAnimate();
+
+    var stationID = GetQueryString("stationID");
+    $("#start_up1>span").click(function () {
+      $("#start_up").removeClass("dis_none").addClass("dis_block");
+      $("#start_up1").removeClass("dis_block").addClass("dis_none");
+
+      $(".gun_img").removeClass("dis_block").addClass("dis_none");
+      $(".checkbox_img").removeClass("dis_none").addClass("dis_block");
+      $(".radio_box").removeClass("dis_none").addClass("dis_block");
+      chkgun()
+    })
+
+    // 关闭一键启动
+    $("#close").click(function () {
+      $("#start_up1").removeClass("dis_none").addClass("dis_block");
+      $("#start_up").removeClass("dis_block").addClass("dis_none");
+
+      $(".gun_img").removeClass("dis_none").addClass("dis_block");
+      $(".checkbox_img").removeClass("dis_block").addClass("dis_none");
+      $(".radio_box").removeClass("dis_block").addClass("dis_none");
+
+      $(".checkbox_img").attr('src', './img/checkbox_normal.png');
+      $('#checkedimg').text('0');
+      $('#c_box').attr('src', './img/box_normal.png');
+      chkgun()
+    })
+
+    $('#siteYong').on('click', function () {
+      location.href = "./individual-users-inside.html?stationID=" + stationID + "&flag=1";
+    })
+
+    $('#backIndex').on('click', function () {
+      location.href = "./";
+    })
+
+    setTimeout(function () {
+      $('.part2').css('left', "0");
+      $('.part4').css('left', "0");
+    }, 1000)
+  </script>
+
+  <script>
+    getSelloNoAndAccount();
+    function getSelloNoAndAccount() {
+      $.ajax({
+        async: false, //true：异步，false：同步。
+        url: "/statistic/gJStationViewAjax/getSelloNoAndAccount.json",
+        type: "post",
+        dataType: "json",
+
+        success: function (data) {
+          $("#sellerNo").val(data.sellerNo);
+          $("#account").val(data.account);
         }
-    </script>
+      })
+    }
 
-    <script type="text/javascript">
-        function changeStation() {
-            var stationID = $("#stationList").val();
-            location.href = "./site-overview-inside.html?stationID=" + stationID;
-        }
-        let bgParams = {//标题背景
-			container: document.getElementById("title_bg"),
-			renderer: "svg",
-			loop: true,
-			autoplay: true,
-			path: "/resources/screen/expoScreen/animation/bg/data.json"
-		}
-		let bgAnim = lottie.loadAnimation(bgParams);
+    function GetQueryString(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]);
+      return null;
+    }
 
-		subtitle = document.getElementsByClassName("subtitle");
-		path = "/resources/screen/expoScreen/animation/subtitle/data.json"
-		for (var i=0; i< subtitle.length; i++ ){
-			let subtitleParams = {//副标题
-				container: subtitle[i],
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim = lottie.loadAnimation(subtitleParams);
-		}
-    </script>
- 
-    <script type="text/javascript">
-        $.myAnimate.insideAnimate();
-        $.myAnimate.overviewAnimate();
-
-        var stationID = GetQueryString("stationID");
-        $("#start_up1>span").click(function() {
-            $("#start_up").removeClass("dis_none").addClass("dis_block");
-            $("#start_up1").removeClass("dis_block").addClass("dis_none");
-
-            $(".gun_img").removeClass("dis_block").addClass("dis_none");
-            $(".checkbox_img").removeClass("dis_none").addClass("dis_block");
-            $(".radio_box").removeClass("dis_none").addClass("dis_block");
-            chkgun()
-        })
-
-        // 关闭一键启动
-        $("#close").click(function() {
-            $("#start_up1").removeClass("dis_none").addClass("dis_block");
-            $("#start_up").removeClass("dis_block").addClass("dis_none");
-
-            $(".gun_img").removeClass("dis_none").addClass("dis_block");
-            $(".checkbox_img").removeClass("dis_block").addClass("dis_none");
-            $(".radio_box").removeClass("dis_block").addClass("dis_none");
-
-            $(".checkbox_img").attr('src', './img/checkbox_normal.png');
-            $('#checkedimg').text('0');
-            $('#c_box').attr('src', './img/box_normal.png');
-            chkgun()
-        })
-
-        $('#siteYong').on('click', function() {
-            location.href = "./individual-users-inside.html?stationID=" + stationID + "&flag=1";
-        })
-
-        $('#backIndex').on('click', function() {
-            location.href = "./index.html?page=2";
-        })
-
-        setTimeout(function() {
-			$('.part2').css('left', "0");
-			$('.part4').css('left', "0");
-		}, 1000) 
-    </script>
-
-    <script>
-        getSelloNoAndAccount();
-        function getSelloNoAndAccount() {
-            $.ajax({
-                async: false, //true：异步，false：同步。
-                url: "/statistic/gJStationViewAjax/getSelloNoAndAccount.json",
-                type: "post",
-                dataType: "json",
-
-                success: function(data) {
-                    $("#sellerNo").val(data.sellerNo);
-                    $("#account").val(data.account);
-                }
-            })
-        }
-
-        function GetQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]);
-            return null;
-        }
-
-        var html;
-        var gunEngNo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
-        var websocket = new WebSocket("ws://" + window.location.host + "/screenWebsocket.wsk?operatorNo=" + $("#sellerNo").val() +
-            "&useraccount=" + $("#account").val() + "&stationID=" + GetQueryString(
-                "stationID"));
-        websocket.onmessage = function(event) {
-            let data = $.parseJSON(event.data);
-            data = data.data;
-            let li = null;
-            let d = new Date();
-            let hour = d.getHours() < 10 ? ('0' + d.getHours()) : d.getHours();
-            let minute = d.getMinutes() < 10 ? ('0' + d.getMinutes()) : d.getMinutes();
-            let nowTime = hour + ":" + minute;
-            let gunIndex = gunEngNo[data.gunNo];
-            let pileName = data.pileName;
-            let icon = null;
-            switch (data.status) {
-                case 3:
-                    icon = '/img/timeline3.png';
-                    descriton = '启动充电'
-                    msg = '启动充电';
-                    break;
-                case 4:
-                    icon = '/img/timeline1.png';
-                    descriton = '充电完成'
-                    msg = '完成充电，用时' + data.useTime;
-                    break;
-                case 8:
-                    icon = '/img/timeline3.png';
-                    descriton = '已经预约'
-                    msg = '已经预约，预约账户' + data.memberNo;
-                    break;
-                case 0:
-                    if (typeof(gunIndex) == "undefined") {
-                        gunIndex = '所有'
-                    }
-                    icon = '/img/timeline2.png';
-                    descriton = '出现告警'
-                    msg = data.alarmName;
-                    break;
-                default:
-                    return;
-            }
-            li = `<li><img width="60" src=".${icon}"><p><span class="mc_8bc">${nowTime}</span>&nbsp;&nbsp;<span>${pileName}#</span>&nbsp;&nbsp;<span>${gunIndex}枪</span>&nbsp;&nbsp;<span>${descriton}</span></p><p>${pileName}#${gunIndex}枪${msg}</p></li>`
-            $("#chargingLog").append(li);
-        }
-    </script>
+    var html;
+    var gunEngNo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+    var websocket = new WebSocket("ws://" + window.location.host + "/screenWebsocket.wsk?operatorNo=" + $("#sellerNo").val() +
+      "&useraccount=" + $("#account").val() + "&stationID=" + GetQueryString(
+        "stationID"));
+    websocket.onmessage = function (event) {
+      let data = $.parseJSON(event.data);
+      data = data.data;
+      let li = null;
+      let d = new Date();
+      let hour = d.getHours() < 10 ? ('0' + d.getHours()) : d.getHours();
+      let minute = d.getMinutes() < 10 ? ('0' + d.getMinutes()) : d.getMinutes();
+      let nowTime = hour + ":" + minute;
+      let gunIndex = gunEngNo[data.gunNo];
+      let pileName = data.pileName;
+      let icon = null;
+      switch (data.status) {
+        case 3:
+          icon = '/img/timeline3.png';
+          descriton = '启动充电'
+          msg = '启动充电';
+          break;
+        case 4:
+          icon = '/img/timeline1.png';
+          descriton = '充电完成'
+          msg = '完成充电，用时' + data.useTime;
+          break;
+        case 8:
+          icon = '/img/timeline3.png';
+          descriton = '已经预约'
+          msg = '已经预约，预约账户' + data.memberNo;
+          break;
+        case 0:
+          if (typeof (gunIndex) == "undefined") {
+            gunIndex = '所有'
+          }
+          icon = '/img/timeline2.png';
+          descriton = '出现告警'
+          msg = data.alarmName;
+          break;
+        default:
+          return;
+      }
+      li = `<li><img width="60" src=".${icon}"><p><span class="mc_8bc">${nowTime}</span>&nbsp;&nbsp;<span>${pileName}#</span>&nbsp;&nbsp;<span>${gunIndex}枪</span>&nbsp;&nbsp;<span>${descriton}</span></p><p>${pileName}#${gunIndex}枪${msg}</p></li>`
+      $("#chargingLog").append(li);
+    }
+  </script>
 </body>
+
 </html>

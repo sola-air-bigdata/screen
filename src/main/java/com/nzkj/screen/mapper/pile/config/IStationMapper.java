@@ -71,4 +71,12 @@ public interface IStationMapper extends BaseMapper<Station> {
      */
     @Select("select st.list_img as image,st.name as name,st.street as address,st.score as score,psum.pilesum as pilesum from t_station st left join (select count(0) pilesum, station_id from t_pile where deleted = 0 group by station_id) psum on psum.station_id = st.id where st.deleted = 0 and st.id = #{stationId} and st.seller_id = #{sellerId} ")
     StationInfoDTO getStationDatanum(@Param("stationId")Long stationId, @Param("sellerId") Long sellerId);
+
+
+    @Select("select * from t_station s where deleted = 0 and s.id = #{stationId}")
+    StationDto getStationDtoById (@Param("stationId")Long stationId);
+
+    @Select("select * from t_station s where deleted = 0 and s.seller_id = #{sellerId}")
+    List<StationDto> getStationDtoListBySellerId(@Param("sellerId") Long sellerId);
+
 }

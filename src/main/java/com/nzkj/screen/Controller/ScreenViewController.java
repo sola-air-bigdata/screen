@@ -13,6 +13,7 @@ import com.nzkj.screen.Entity.AllMonthData;
 import com.nzkj.screen.Entity.DTO.*;
 import com.nzkj.screen.Entity.Station;
 import com.nzkj.screen.Entity.TotalOperateData;
+import com.nzkj.screen.Service.ScreenRedisService;
 import com.nzkj.screen.Service.StationService;
 import com.nzkj.screen.Utils.*;
 import com.nzkj.screen.mapper.pile.config.IStationMapper;
@@ -73,6 +74,9 @@ public class ScreenViewController {
 
     @Autowired
     private IStationMapper stationMapper;
+
+    @Autowired
+    private ScreenRedisService screenRedisService;
 
 
 
@@ -137,6 +141,83 @@ public class ScreenViewController {
 
     }
 
+    /*
+     * 根据站点Id统计总共服务用户分级数量
+     *
+     * @param stationID
+     *
+     * @url /statistic/gJStationViewAjax/getUserServiceNum.json
+     *
+     * @return map key : memNums(人数) grade(等级) proportion(占比)
+     */
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getUserServiceNum.json" ,method = RequestMethod.POST)
+    public List<Map<String, Object>> doGetUserServiceNum(Long stationID){
+        return screenRedisService.doGetUserServiceNum(stationID);
+    }
+
+    /*
+     * 根据站点Id统计站点个人用户数据
+     *
+     * @url /statistic/gJStationViewAjax/getStationMemData.json
+     *
+     * @return map key :allservice(服务用户总数) perCapitaCharging(人均充电消费)
+     * monthAppointment(月充电预约) monthEvent(月活动参与) fans(忠实粉丝占比)
+     * chargingConsumption(月均人均充电)
+     */
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationMemData.json" ,method = RequestMethod.POST)
+    public Map<String, Object> doGetStationMemData(Long stationID){
+        return screenRedisService.doGetStationMemData(stationID);
+    }
+
+    /*
+     * 根据站点id统计每个月第一次充电用户的增长数量，共12个月
+     *
+     * @url /statistic/gJStationViewAjax/getMemberAddByMonth.json
+     *
+     * @return map key : time(年月) memberNum(人数)
+     */
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getMemberAddByMonth.json" ,method = RequestMethod.POST)
+    public List<Map<String, Object>> doGetMemberAddByMonth(Long stationID){
+        return screenRedisService.getMemberAddByMonth(stationID);
+    }
+
+    /*
+     * 根据站点id显示个人会员用户在场站每月24小时内，每小时内的消费总次数
+     *
+     * @url /statistic/gJStationViewAjax/getMemberByHours.json
+     *
+     * @return map key ：charingNum(充电数) time(时间)
+     */
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getMemberByHours.json" ,method = RequestMethod.POST)
+    public List<Map<String, Object>> doGetMemberByHours(Long stationID){
+        return screenRedisService.getMemberByHours(stationID);
+    }
+
+    /*
+     * 根据站点id显示当月在该场站重复充电大于等于20次、10次、5次的个人会员数量占比
+     *
+     * @url /statistic/gJStationViewAjax/getFansProportion.json
+     *
+     * @return map key : oneToFive（1≤X﹤5） fiveToTen(5≤X﹤10) tenToTwenty(10≤X﹤20)
+     * twentyTo(20≤X﹤∞)
+     */
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getFansProportion.json" ,method = RequestMethod.POST)
+    public Map<String, Object> doGetFansProportion(Long stationID){
+        return screenRedisService.getFansProportion(stationID);
+    }
+
+    /*
+     * 根据站点id显示当月在该场站充电消费排名前8的个人会员用户
+     *
+     * @url /statistic/gJStationViewAjax/getConsumptionRanking.json
+     *
+     * @return map key : name(用户名称) charingNum(充电次数) allbalance(消费总金额(分)) image 头像
+     */
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getConsumptionRanking.json" ,method = RequestMethod.POST)
+    public List<Map<String, Object>> doGetConsumptionRanking(Long stationID){
+        return screenRedisService.getConsumptionRanking(stationID);
+    }
+
     /**
      * @describe
      * 获取总功率
@@ -162,40 +243,7 @@ public class ScreenViewController {
      */
     @RequestMapping(value = "/statistic/screenNewAjax/historyTotalCharging.json",method = RequestMethod.POST)
     public Map<String, Object> historyTotalCharging(){
-        Map<String, Object> mapDatas = new HashMap<>();
-        long sumPower = 0L;
-        long temPower = 0L;
-        double rate = 0;
-
-        try {
-            //t_all_table→ redis-key：AT_商家号_查询的字段名
-            String totalPowerkey = String.format("AT_%s_%s", sellerId, "total_charging_power");
-            String teamPowerkey = String.format("AT_%s_%s", sellerId, "teamPower");
-
-            sumPower = ValUtil.toLong(redisTemplate.opsForValue().get(totalPowerkey),0L);
-            temPower = ValUtil.toLong(redisTemplate.opsForValue().get(teamPowerkey),0L);
-            if(sumPower == 0 || temPower == 0){
-                //缓存中未能获取到  从数据库获取
-                sumPower = ValUtil.toLong(totalOperateMapper.get(sellerId).getTotalChargingPower());
-                temPower = ValUtil.toLong(totalOperateMapper.get(sellerId).getTeamChargingPower());
-                //获取到的数据再缓存到redis
-                redisTemplate.opsForValue().set(totalPowerkey,sumPower,expireTime,TimeUnit.SECONDS);
-                redisTemplate.opsForValue().set(teamPowerkey,temPower,expireTime,TimeUnit.SECONDS);
-            }
-                if(sumPower != 0){
-                    rate = BigDecimal.valueOf(temPower*100).divide(BigDecimal.valueOf(sumPower), 2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                }
-                mapDatas.put("sumPower", sumPower);
-                mapDatas.put("rate", rate);
-
-        }catch (Exception e){
-            e.printStackTrace();
-            mapDatas.put("sumPower", sumPower);
-            mapDatas.put("rate", rate);
-            return mapDatas;
-        }
-
-        return mapDatas;
+        return screenRedisService.doHistoryTotalCharging();
     }
 
     /**
@@ -208,8 +256,8 @@ public class ScreenViewController {
         List<Map<String, String>> mapList = new ArrayList<>();
         try {
             //为了出数据把这里写死 实际项目应该改回来 todo
-            List<StationServiceDTO> objList = stationShowTotalMapper.getStationServiceList(20l, "2020-05");
-//            List<StationServiceDTO> objList = stationShowTotalMapper.getStationServiceList(sellerId, TimeUtils.format(new Date(), "yyyy-MM"));
+//            List<StationServiceDTO> objList = stationShowTotalMapper.getStationServiceList(sellerId, "2020-05");
+            List<StationServiceDTO> objList = stationShowTotalMapper.getStationServiceList(sellerId, TimeUtils.format(new Date(), "yyyy-MM"));
             if( !CollectionUtils.isEmpty(objList) ) {
                 for (StationServiceDTO object : objList) {
                     Map<String, String> mapData = new HashMap<>();
@@ -829,7 +877,8 @@ public class ScreenViewController {
         List<GunMonitorDto> guns = localMemoryData.getGunBySeller(sellerId);
         if(CollectionUtil.isNotEmpty(guns)) {
             for(GunMonitorDto gun : guns) {
-                if(gun.getGunState() != 3) {
+                // gun.getGunState() != 3 老架构是这个  迁移之后gunState为null
+                if(gun.getRealGunState() != 3) {
                     continue;
                 }
                 //用户多充算一个
@@ -905,7 +954,7 @@ public class ScreenViewController {
         if (stationID != null) {
             List<GunMonitorDto> getGunByStation = localMemoryData.getGunByStation(stationID);
             for (GunMonitorDto real : getGunByStation) {
-                if (real.getGunState() == 3 && real.getCurrent() != null
+                if (real.getRealGunState() == 3 && real.getCurrent() != null
                         && real.getVoltage() != null) {
                     realTimePower += (real.getCurrent() / 1000) * (real.getVoltage() / 1000);
                 }

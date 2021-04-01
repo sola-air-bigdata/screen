@@ -4,24 +4,24 @@
     box-sizing: border-box;
 }
 body.scaled {
-    width: 1920px;
+    /* width: 1920px; */
 }
 html,
 body {
-    width: 1920px;
-    height: 1080px;
+    /* width: 1920px; */
+    height: 1163px;
     color:#fff;
     font-size: 18px;
 }
 body {
-    width: 1920px;
+    /* width: 1920px; */
     background: #020042;
     font-family: "Microsoft YaHei"; 
 }
 
 .main {
     width: 1920px;
-    height: 1080px;
+    height: 100%;
     padding: 50px 30px;
     position: relative;
 }
@@ -114,7 +114,7 @@ a{
     background-color:transparent;
 }
 .part1{
-    width: 1850px;
+    width: 97%;
     height: 345px;
     background:rgba(11, 46, 130,0.45);
     position: absolute;

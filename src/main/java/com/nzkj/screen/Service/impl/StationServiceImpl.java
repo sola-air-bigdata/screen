@@ -288,35 +288,21 @@ public class StationServiceImpl implements StationService {
         try {
             //t_all_month_table AMT_商家号_月份(yyyy-MM)_查询的字段名
             String moth = TimeUtils.format(new Date(), "yyyy-MM");
-            String key = String.format("AMT_%s_%s_%s", condition.getSellerId(), moth, "month_fault_pile");
-            //1、 如果redis中没有故障桩值
-            if( redisTemplate.opsForValue().get(key) == null ){
-                //1.1 从数据库获取故障桩值
-                BigInteger faultCountKey =allMonthDataMapper.getFaultPile(sellerId,TimeUtils.format(new Date(), "yyyy-MM"));
-                //1.2 存进redis中并赋值给变量faultCount
-                faultCountKey = faultCountKey == null ? BigInteger.ZERO: faultCountKey;
-                redisTemplate.opsForValue().set(key, faultCountKey,expireTime,TimeUnit.SECONDS);
-                faultCount = faultCountKey.intValue();
-            }else
-            {
-                //2、 如果redis有从redis获取
-                faultCount = ValUtil.toInteger(redisTemplate.opsForValue().get(key));
-            }
+
+            //1.1 从数据库获取故障桩值
+            BigInteger faultCountKey =allMonthDataMapper.getFaultPile(sellerId,TimeUtils.format(new Date(), "yyyy-MM"));
+            //1.2 存进redis中并赋值给变量faultCount
+            faultCountKey = faultCountKey == null ? BigInteger.ZERO: faultCountKey;
+            faultCount = faultCountKey.intValue();
 
 
-            String totalChargingPileCountKey = String.format("AT_%s_%s", condition.getSellerId(), "total_charging_pile_count");
-            //3、如果redis中没有总故障桩值
+
+
             //根据key： 总桩数 AT_商家号_查询的字段名
-            if( redisTemplate.opsForValue().get(totalChargingPileCountKey) == null ){
                 //3.1 从数据库获取总故障桩值
                 BigInteger totalChargingPileCount =  totalOperateMapper.getChargingPileCount(sellerId);
                 //3.2 存进redis中并赋值给变量totalfaultCount
-                redisTemplate.opsForValue().set(totalChargingPileCountKey, totalChargingPileCount,expireTime,TimeUnit.SECONDS);
                 totalfaultCount = totalChargingPileCount.intValue();
-            }else {
-                //4、 如果redis有从redis获取
-                totalfaultCount = Integer.parseInt(redisTemplate.opsForValue().get(totalChargingPileCountKey).toString());
-            }
 
             //5、 计算桩故障率=当月故障电桩总数÷电桩总数
             rate = ValUtil.toDivBigDecimal(faultCount*100, totalfaultCount, 2).doubleValue();
@@ -665,10 +651,10 @@ public class StationServiceImpl implements StationService {
 
     /**
      * @Title
-     * @Description：获取当日非公交充电排行(admin用户登陆和个人用户登陆)********************************************
+     * @Description：获取当日非公交充电排行
      * @Param： sellerId 商家id 会员id
      * @Return：List
-     * @author <a href="mail to: *******@******.com" rel="nofollow">huangxw</a>
+     * @author
      * @CreateDate：2019年9月20日15:22:26
      *@update：[序号] [日期YYYY-MM-DD] [更改人名] [变更描述]
      */
@@ -688,35 +674,7 @@ public class StationServiceImpl implements StationService {
             }
             return incomeRankDtoList;
         }
-//        else {
-//            //普通用户登陆展示排行
-//            //1、如果redis有数据从数据库获取t_all_day_member_table→ redis-key：DMEMT_商家号_日期(yyyy-MM-dd)_会员ID_查询的字段名
-//            if (redisTemplate.opsForValue().get(NonBusChargingKey) != null) {
-//                incomeRankDto.setActualBalance(ValUtil.toLong(redisTemplate.opsForValue().get(NonBusChargingKey), 0L));
-//            } else {
-//                //1.1、如果redis没有数据从数据库获取
-//                List<AllDayMember> resData = allDayMemberMapper.getdayTransIncomeRank(sellerId, TimeUtils.formatTimeToDay(new Date()));
-//                if (CollectionUtils.isNotEmpty(resData)) {
-//                    redisTemplate.opsForValue().set(NonBusChargingKey,res[0],expireTime,TimeUnit.SECONDS);
-//                    incomeRankDto.setActualBalance(ValUtil.toLong(res[0], 0L));
-//                }
-//            }
-//
-//            //2、如果redis有数据从数据库获取t_all_day_member_table→ redis-key：DMEMT_商家号_日期(yyyy-MM-dd)_会员ID_查询的字段名
-//            if (redisTemplate.opsForValue().get(userNameKey) != null) {
-//                incomeRankDto.setName(ValUtil.toString(redisTemplate.opsForValue().get(userNameKey)));
-//            } else {
-//                //2.1、如果redis没有数据从数据库获取
-//                List<Object> resData = (List<Object>) allDayDataRepository.getdayTransIncomeRank(sellerId, userId, TimeUtils.formatTimeToDay(new Date()));
-//                if (CollectionUtils.isNotEmpty(resData)) {
-//                    Object[] res = (Object[]) resData.get(0);
-//                    redisTemplate.opsForValue().set(userNameKey,res[1],expireTime,TimeUnit.SECONDS);
-//                    incomeRankDto.setName(ValUtil.toString(res[1]));
-//                }
-//            }
-//            incomeRankDtoList.add(incomeRankDto);
-//
-//        }
+
         return incomeRankDtoList;
     }
 
@@ -726,148 +684,47 @@ public class StationServiceImpl implements StationService {
      * @Description：获取历史总收入或当日收入(收入方式统计)
      * @Param：
      * @Return：Map day_i_actual_balance_wechat 微信  day_i_actual_balance_app APP day_i_actual_balance_card 银行卡 day_i_actual_balance_vin vin卡
-     * @author  huangxw
-     * @CreateDate：2019年9月23日11:30:45
-     *@update：[序号] [日期YYYY-MM-DD] [更改人名] [变更描述]
      */
     @Override
     public Map<String, Long> getChargeBalanceSum(SelectCondition condition) {
         Map<String, Long> balanceMap = new HashMap<>();
-        String wechatKey=null;
-        String appKey =null;
-        String cardKey =null;
-        String vinKey =null;
+
         AllDayData obj = new AllDayData();
         try {
-            //AT_商家号_查询的字段名 total_wechat_actual_balance, total_app_actual_balance, total_card_actual_balance, total_vin_actual_balance
-            String totalWechatKey = String.format("AT_%s_%s", condition.getSellerId(), "total_wechat_actual_balance");
-            String totalAppKey = String.format("AT_%s_%s", condition.getSellerId(), "total_app_actual_balance");
-            String totalCardKey = String.format("AT_%s_%s", condition.getSellerId(), "total_card_actual_balance");
-            String totalVinKey = String.format("AT_%s_%s", condition.getSellerId(), "total_vin_actual_balance");
+
 
             //1 如果有传日期从商家日期统计表获取数据
             if( condition.getStartDate() != null ) {
-                //ADT_商家号_日期(yyyy-MM-dd)_查询的字段名
-                wechatKey = String.format("ADT_%s_%s_%s", condition.getSellerId(),TimeUtils.format(condition.getStartDate(),"yyyy-MM-dd"), "day_i_actual_balance_wechat");
-                appKey = String.format("ADT_%s_%s_%s", condition.getSellerId(), TimeUtils.format(condition.getStartDate(),"yyyy-MM-dd"), "day_i_actual_balance_app");
-                cardKey = String.format("ADT_%s_%s_%s", condition.getSellerId(), TimeUtils.format(condition.getStartDate(),"yyyy-MM-dd"), "day_i_actual_balance_card");
-                vinKey = String.format("ADT_%s_%s_%s", condition.getSellerId(), TimeUtils.format(condition.getStartDate(),"yyyy-MM-dd"), "day_i_actual_balance_vin");
-                if(redisTemplate.opsForValue().get(wechatKey) == null || redisTemplate.opsForValue().get(appKey) == null || redisTemplate.opsForValue().get(cardKey) == null || redisTemplate.opsForValue().get(vinKey) == null ){
-                    //如果redis中不存在缓存，从数据库中获取数据集复制给变量 obj
-                    obj = allDayMapper.get(sellerId,TimeUtils.formatTimeToDay(condition.getStartDate()));
-                }
+
+                obj = allDayMapper.get(sellerId,TimeUtils.formatTimeToDay(condition.getStartDate()));
 
                 //1.1从数据集获取微信日收入统计
-                balanceMap.put("wx", 0L);
-                if( redisTemplate.opsForValue().get(wechatKey) == null ) {
-                    if (obj != null) {
-                        redisTemplate.opsForValue().set(wechatKey, obj.getDayIActualBalanceWechat(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("wx",  ValUtil.toLong(obj.getDayIActualBalanceWechat(), 0L));
-                    }
-                }else {
-                    //从redis获取微信日收入统计
-                    balanceMap.put("wx",  ValUtil.toLong(redisTemplate.opsForValue().get(wechatKey), 0L));
-                }
+
+                balanceMap.put("wx",  ValUtil.toLong(obj.getDayIActualBalanceWechat(), 0L));
+
 
                 //1.2从数据集redis获取APP日收入统计
-                balanceMap.put("app", 0L);
-                if( redisTemplate.opsForValue().get(appKey) == null ) {
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(appKey, obj.getDayIActualBalanceApp(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("app",  ValUtil.toLong(obj.getDayIActualBalanceApp(), 0L));
-                    }
-                }else {
-                    //从redis获取APP日收入统计
-                    balanceMap.put("app",  ValUtil.toLong(redisTemplate.opsForValue().get(appKey), 0L));
-                }
+                balanceMap.put("app",  ValUtil.toLong(obj.getDayIActualBalanceApp(), 0L));
+
                 //1.3从数据集获取银行卡日收入统计
-                balanceMap.put("card", 0L);
-                if( redisTemplate.opsForValue().get(cardKey) == null ) {
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(cardKey, obj.getDayIActualBalanceCard(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("card",  ValUtil.toLong(obj.getDayIActualBalanceCard(), 0L));
-                    }
-                }else {
-                    //从redis获取银行卡日收入统计
-                    balanceMap.put("card",  ValUtil.toLong(redisTemplate.opsForValue().get(cardKey), 0L));
-                }
+                balanceMap.put("card",  ValUtil.toLong(obj.getDayIActualBalanceCard(), 0L));
+
                 //1.4从数据集获取vin卡日收入统计
-                balanceMap.put("vin", 0L);
-                if( redisTemplate.opsForValue().get(vinKey) == null ) {
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(vinKey, obj.getDayIActualBalanceVin(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("vin",  ValUtil.toLong(obj.getDayIActualBalanceVin(), 0L));
-                    }
-                }else {
-                    //从redis获取vin卡日收入统计
-                    balanceMap.put("vin",  ValUtil.toLong(redisTemplate.opsForValue().get(vinKey), 0L));
-                }
+                balanceMap.put("vin",  ValUtil.toLong(obj.getDayIActualBalanceVin(), 0L));
+
             }else {
                 //2 如果日期为空从商家分类统计表获取数据
-                if (redisTemplate.opsForValue().get(totalWechatKey) == null || redisTemplate.opsForValue().get(totalAppKey) == null || redisTemplate.opsForValue().get(totalCardKey) == null || redisTemplate.opsForValue().get(totalVinKey) == null) {
-                    //如果redis中不存在缓存，从数据库中获取数据集复制给变量 obj
-                    obj = allDayMapper.get(sellerId,TimeUtils.formatTimeToDay(new Date()));
-                }
-                //2.1 如果redis中不存在历史收入统计数据
-                balanceMap.put("wx", 23L);
-                if( redisTemplate.opsForValue().get(totalWechatKey) == null ) {
-                    //2.1.1从数据集获取微信历史收入统计添加到
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(totalWechatKey, obj.getDayIActualBalanceWechat(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("wx",  ValUtil.toLong(obj.getDayIActualBalanceWechat(), 0L));
-                    }else {
-                        balanceMap.put("wx", 0L);
-                    }
-                }else {
-                    //从redis获取微信历史收入统计
-                    balanceMap.put("wx",  ValUtil.toLong(redisTemplate.opsForValue().get(totalWechatKey), 0L));
-                }
-                //2.2 如果redis中不存在APP历史收入统计数据
-                if( redisTemplate.opsForValue().get(totalAppKey) == null ) {
-                    //2.2.1从数据集获取APP历史收入统计
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(totalAppKey, obj.getDayIActualBalanceApp(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("app",  ValUtil.toLong(obj.getDayIActualBalanceApp(), 0L));
-                    }else {
-                        balanceMap.put("app", 0L);
-                    }
-                }else {
-                    //从redis获取APP历史收入统计
-                    balanceMap.put("app",  ValUtil.toLong(redisTemplate.opsForValue().get(totalAppKey), 0L));
-                }
-                //2.3 如果redis中不存在银行卡历史收入统数据
-                if( redisTemplate.opsForValue().get(totalCardKey) == null ) {
-                    //2.3.1从数据集获取银行卡历史收入统计
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(totalCardKey, obj.getDayIActualBalanceCard(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("card",  ValUtil.toLong(obj.getDayIActualBalanceCard(), 0L));
-                    }else {
-                        balanceMap.put("card", 0L);
-                    }
-                }else {
-                    //从redis获取银行卡历史收入统计
-                    balanceMap.put("card",  ValUtil.toLong(redisTemplate.opsForValue().get(totalCardKey), 0L));
-                }
-                //2.4 如果redis中不存在vin卡历史收入统计数据
-                if( redisTemplate.opsForValue().get(totalVinKey) == null ) {
-                    //2.4.1从数据集获取vin卡历史收入统计
-                    if (obj != null)
-                    {
-                        redisTemplate.opsForValue().set(totalVinKey, obj.getDayIActualBalanceVin(),expireTime,TimeUnit.SECONDS);
-                        balanceMap.put("vin",  ValUtil.toLong(obj.getDayIActualBalanceVin(), 0L));
-                    }else {
-                        balanceMap.put("vin", 0L);
-                    }
-                }else {
-                    //从redis获取vin卡历史收入统计
-                    balanceMap.put("vin",  ValUtil.toLong(redisTemplate.opsForValue().get(totalVinKey), 0L));
-                }
+                obj = allDayMapper.get(sellerId,TimeUtils.formatTimeToDay(new Date()));
+
+
+                balanceMap.put("wx",  ValUtil.toLong(obj.getDayIActualBalanceWechat(), 0L));
+
+                balanceMap.put("app",  ValUtil.toLong(obj.getDayIActualBalanceApp(), 0L));
+
+                balanceMap.put("card",  ValUtil.toLong(obj.getDayIActualBalanceCard(), 0L));
+
+                balanceMap.put("vin",  ValUtil.toLong(obj.getDayIActualBalanceVin(), 0L));
+
             }
 
 

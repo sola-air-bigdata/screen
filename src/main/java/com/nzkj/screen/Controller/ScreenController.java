@@ -169,7 +169,7 @@ public class ScreenController {
      * stationRating(站点评级) stationPile(站点桩数量)
      *  //删除 --> electricityPrice(优惠电价)
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationInfoByID.json", method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationInfoByID.json", method = RequestMethod.POST)
     public Map<String, Object> doGetStationInfoByID(@Param("stationID") Long stationID) {
         return screenRedisService.doGetStationInfoByID(stationID);
     }
@@ -180,7 +180,7 @@ public class ScreenController {
      * @param stationID
      * @return
      */
-    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationEquipmentInfo.json", method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationEquipmentInfo.json", method = RequestMethod.POST)
     public Map<String, Object> doGetStationEquipmentInfo(@Param("stationID") Long stationID){
         return screenRedisService.doGetStationEquipmentInfo(stationID);
     }
@@ -193,6 +193,13 @@ public class ScreenController {
     public JSONArray getStationInServiceMapData(){
         return screenRedisService.getStationInServiceMapData();
     }
+
+
+    @RequestMapping(value = "/statistic/gJStationViewAjax/getStationList.json",method = RequestMethod.POST)
+    public List<StationDto> doGetStationList() {
+        return screenRedisService.getStationDto();
+    }
+
 
 
 

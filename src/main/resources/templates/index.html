@@ -1,538 +1,586 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		<title>广州公交新能源-如约充电-站点总览</title>
-		<link rel="stylesheet" href="./css/index.css">
-		<link rel="stylesheet" href="./css/site-center.css">
-		<link rel="stylesheet" type="text/css" href="./css/component.css" />
-		<link rel="stylesheet" type="text/css" href="./css/custom-bars.css" />
-		<style>
-			#service_times .bar .bar-face{
-                width: 262px;
-                height: 10px;
-                bottom: 82px;
-                left: -4px;
-            }
-            #service_times .bar .bar-face.face-position.left{
-                width: 10px;
-                transform: rotateX(-90deg) rotateY(-90deg) translateX(-10px) translateZ(6px);
-                background-color:transparent;
-            }
-            #service_times .bar .bar-face.face-position.right{
-                width: 10px;
-                right: 97px;
-                left: auto;
-                transform: rotateX(-90deg) rotateY(94deg) translateX(8px);
-            }
-            #service_times .bar .bar-face.face-position.back{
-                transform: rotateX(-78deg) rotateY(0deg) translateZ(-16px);
-            }
-            #service_times .bar .bar-face.face-position.roof{
-                transform: translateZ(10px);
-            }
-            #service_times .bar.red .bar-face, .bar.red[aria-valuenow='0'] .face-position.right{
-                background-color:rgba(233, 173, 76, 0.4);
-            }
-            #service_times .bar.heat-gradient .percentage:before{
-                background: rgba(124, 226, 231, 0.9);
-            }
-			.animate{
-                width: 54px;
-                display:inline-block;
-                overflow: hidden;
-                transform: translate3d(0,0,0);
-                position: absolute;
-                top: 4px;
-            }
-			.animate_inside{
-                width: 55px;
-                height: 55px;
-                position: absolute;
-			}
-        </style>
-	</head>
-	<body class="scaled">
-		<div class="main">
-			<div id="title_bg" style="position: absolute;top:-7px;left:536px;z-index:9999;"></div>
-			<div style="width:1038px;height:144px;background: linear-gradient(to top,rgba(7, 27, 77,0), rgba(2, 0, 66,1));position: absolute;top:0px;left:441px;z-index:999;"></div>
-			<time id="time" style="z-index:999;"></time>
-			
-			<div class="part_1 fl">
-				<section class="site site1 fl">
-					<div class="site-title">
-						<div id="equipment" class="animate"></div>
-						<h1>设备功率</h1>
-					</div>
-					<div class="total_power">
-						<div class="power_total">总功率<span class="allPower myfont"></span><span style="font-size: 16px;" id="allPowerDw">kw</span><span style="font-size:32px;color:#8BC6FB;margin-left:0;font-weight: 500;">/</span>实时<span
-								class="realTimePower myfont"></span><span style="font-size: 16px;">kw</span></div>
-						<div style="width:88%;height:65px;margin-left:4px;position:relative;top:-35px;">
-							<div class="progress-factor flexy-item">
-								<div class="progress-bar">
-									<div class="bar has-rotation has-colors red heat-gradient" role="progressbar" aria-valuenow="0" aria-valuemin="0"
-										aria-valuemax="100" id="chargingPercentBar">
-										<div class="bar-face face-position roof percentage"></div>
-										<div class="bar-face face-position back percentage"></div>
-										<div class="bar-face face-position floor percentage volume-lights"></div>
-										<div class="bar-face face-position left"></div>
-										<div class="bar-face face-position right" style="background-color: rgba(124, 226, 231, 0.4);"></div>
-										<div class="bar-face face-position front percentage volume-lights shine"></div>
-									</div>
-								</div>
-							</div>
-							<div style="position:absolute;top:46px;left: 100%;color: #2BDEF7;font-size: 20px;font-weight: 600;transform:rotateZ(90deg);" class="chargingPercentBar1 myfont"></div>
-						</div>
-					</div>
-					<div class="charging_capacity" style="margin-top: -24px;">
-						<div class="subtitle" id="subtitle1">
-							<h1>总充电量</h1>
-						</div>
-						<div class="capacity_total">
-							<p><span class="sumPower myfont"></span> <span style="font-size: 16px;" id="sumPowerDw">kwh</span></p>
-							<div id="charging" style="height:80px;width:80px;top:0px;right:20px;"></div>
-						</div>
-						<div id="chart" style="height:150px;width:100%;"></div>
-					</div>
-					<div class="device_failure" style="margin-top:0px;">
-						<div class="subtitle" id="subtitle2">
-							<h1>故障情况</h1>
-						</div>
-						<div class="failure_data" style="margin-top:-6px;">
-							<div class="month_failure">
-								<p>故障率: <span style="font-size: 28px;font-weight:600;color:#EA5558;" id="faultCountrate" class="myfont"></span></p>	
-							</div>
-							<div class="month_failure">
-								<p>月故障数: <span><span style="font-size: 28px;font-weight:600;" class="faultCount myfont"></span>个</span></p>	
-							</div>
-							<div id="failure1" style="height:150px;width:100%;"></div>
-						</div>
-					</div>	
-				</section>
-			</div>
-			<div class="part_2 fl" id="part"></div>
-			<div class="part_3 fl">
-				<section class="site site2 fl">
-					<div class="site-title">
-						<div id="user" class="animate"></div>
-						<h1>会员信息</h1>
-					</div>
-					<div class="mt20">
-						<div class="service_times">
-							累计服务用户数 <div class="roll_number myfont" id="container1" style="margin-left:-2px;"></div>
-							<span class="fr" id="totalServiceMemberNumIndex">个</span>
-						</div>
-						<div class="power_value" style="margin-top:-4px;">车队:<span class="teamCount myfont" style="font-size: 18px;"></span>
-							<p style="float: right;">个人:<span class="personageCount myfont" style="font-size: 18px;"></span></p>
-						</div>
-						<div class="operational_data">
-							<ul class="data_list1" style="width: 101%;">
-								<li style="width:79%;"><span style="width:100%;background: linear-gradient(to right,#94A8C4, #C2D9E2);"></span></li>
-								<li style="width:11%;"><span style="width:100%;background: linear-gradient(to right,#FFAC01, #FFDA64);"></span></li>
-								<li style="width:5%;"><span style="width:100%;background: linear-gradient(to right,#FED685, #FFEFC1);"></span></li>
-								<li style="width:3%;"><span style="width:100%;background: linear-gradient(to right,#D5D9E0, #C7CCD6);"></span></li>
-								<li style="width:0%;"><span style="width:100%;background: linear-gradient(to right,#2759B9, #4183FE);"></span></li>
-							</ul>
-							<ul class="data_list2" style="height:30px;">
-								<li style="background-image:-webkit-linear-gradient(top,#94A8C4, #C2D9E2);">银卡 <span class="silverRate myfont">0</span></li>
-								<li style="background-image:-webkit-linear-gradient(top,#FFAC01, #FFDA64);">金卡 <span class="goldRate myfont">0</span></li>
-								<li style="background-image:-webkit-linear-gradient(top,#FED685, #FFEFC1);">白金 <span class="platinumRate myfont">0</span></li>
-								<li style="background-image:-webkit-linear-gradient(top,#D5D9E0, #C7CCD6);">钻石 <span class="diamondRate myfont">0</span></li>
-								<li style="background-image:-webkit-linear-gradient(top,#2759B9, #4183FE);">黑金 <span class="blackGoldRate myfont">0</span></li>
-							</ul>
-						</div>
-					</div>
-					<div class="growth_trend" style="margin-top:12px;">
-						<div class="subtitle" id="subtitle5">
-							<h1>会员发展趋势</h1>
-						</div>
-						<div id="growth_trend" style="height:150px;width:100%;"></div>
-					</div>
-					<div class="growth_trend" style="margin-top: -10px;">
-						<div class="subtitle" id="subtitle6">
-							<h1>会员活跃情况</h1>
-						</div>
-						<div id="active_trend" style="height:150px;width:100%;"></div>
-					</div>
-				</section>
-			</div>
-			<div class="part_4">
-				<section class="site site3 fl" style="margin-left:4%;width: 90%;">
-					<div class="content" style="padding-right: 3%;">
-						<div class="site-title">
-							<div id="service" class="animate"></div>
-							<h1>充电服务</h1>
-						</div>
-						<div style="margin-top: 22px;">
-							<div class="service_times num_scrolling">
-								累计服务次数 <div class="roll_number myfont" id="container3" style="margin-left: -3px;"></div>
-								<span class="fr" id="serviceTotalCountIndex">次</span>
-							</div>
-							<div class="charging_capacity" style="margin-top:-28px;">
-								<div class="subtitle" id="subtitle3">
-									<h1 style="font-size: 16px;top:21px;">总充电时长</h1>
-								</div>
-								<div class="capacity_total">
-									<p style="text-align: center;"><span class="totalChargingTime myfont"></span><b>小时</b></p>
-								</div>
-								<div class="capacity_bg" style="height:140px;width:100%;margin-top: 0px;">
-									<div class="fl" style="width:52%;">
-										<p style="color:#8BC6FB;">公交<span style="color:#2BDEF7;"><span style="font-size: 18px;" class="AverageTimeForGong myfont">2.56</span>小时/次</span></p>
-										<p style="margin-top:6px;"><span style="font-size:30px;" class="gongChargingTime myfont">0</span><b>小时</b></p>
-									</div>
-									<div class="fl" style="width:43%;">
-										<p style="color:#8BC6FB;">其他<span style="color:#2BDEF7;"><span style="font-size: 18px;" class="AverageTimeForOther myfont">1.5</span>小时/次</span></p>
-										<p style="margin-top:6px;"><span style="font-size:30px;" class="otherChargingTime myfont"></span><b>小时</b></p>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>	
-					<div class="content" style="padding-left: 3%;">
-						<div class="mt20">
-							<div style="width:100%;height:45px;" id="service_times">
-								<div class="power_value"><span class="gongPercent myfont">0</span>
-									<p style="float: right;"><span style="color:#E79E26;" class="anotherPercent myfont">0</span></p>
-								</div>
-								<div class="progress-factor flexy-item" style="position: relative;top:-15px;">
-									<div class="progress-bar">
-										<div class="bar has-rotation has-colors red heat-gradient" role="progressbar" aria-valuenow="0" aria-valuemin="0"
-										 aria-valuemax="100" id="gongPercentBar">
-											 <div class="bar-face face-position roof percentage"></div>
-											<div class="bar-face face-position back percentage"></div>
-											<div class="bar-face face-position floor percentage volume-lights"></div>
-											<div class="bar-face face-position left"></div>
-											<div class="bar-face face-position right"></div>
-											<div class="bar-face face-position front percentage volume-lights shine"></div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="power_value">公交:<span class="serviceGongCount myfont"></span>
-								<p style="float: right;">其他:<span style="color:#E79E26;" class="serviceAnotherCarCount myfont">0次</span></p>
-							</div>
-						</div>
-						<div class="device_failure" style="margin-top:3px;">
-							<div class="subtitle" id="subtitle4">
-								<h1 style="font-size: 16px;top:21px;">充电服务排名</h1>
-							</div> 
-							<div class="site_service" style="margin-top:10px;">
-								<ul>
-									<li>
-										<div class="site_number"><span class="site_number_1" style="background: url('./img/num1.png') no-repeat;background-size: 100% 100%;">1</span></div>
-										<div class="site_content rankList">
-											<div class="site_name">
-												<h1 class="fl ellipse fw500">---</h1>
-												<p class="fr"><span style="font-size:20px;" class="chargeCount myfont">0</span><span>次</span></p>
-											</div>
-											<div class="site_num mt1">
-												累计充电次数:<span class="mr40 allChargeCount myfont">0次</span>枪数:<span class="gunCount myfont">0支</span>
-											</div>
-										</div>
-									</li>
-									<li>
-										<div class="site_number"><span class="site_number_1" style="background: url('./img/num2.png') no-repeat;background-size: 100% 100%;">2</span></div>
-										<div class="site_content rankList">
-											<div class="site_name">
-												<h1 class="fl ellipse fw500">---</h1>
-												<p class="fr"><span style="font-size:20px;" class="chargeCount myfont">0</span><span>次</span></p>
-											</div>
-											<div class="site_num mt1">
-												累计充电次数:<span class="mr40 allChargeCount myfont">0次</span>枪数:<span class="gunCount myfont">0支</span>
-											</div>
-										</div>
-									</li>
-									<li>
-										<div class="site_number"><span class="site_number_1" style="background: url('./img/num3.png') no-repeat;background-size: 100% 100%;">3</span></div>
-										<div class="site_content rankList">
-											<div class="site_name">
-												<h1 class="fl ellipse fw500">---</h1>
-												<p class="fr"><span style="font-size:20px;" class="chargeCount myfont">0</span><span>次</span></p>
-											</div>
-											<div class="site_num mt1">
-												累计充电次数:<span class="mr40 allChargeCount myfont">0次</span>枪数:<span class="gunCount myfont">0支</span>
-											</div>
-										</div>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>		
-				</section>
-			</div>
-			<div class="part_5">
-				<section class="site site4 fr" style="margin: 0 2%;width: 94%;">
-					<div class="content" style="padding-right: 3%;">
-						<div class="site-title">
-							<div id="income" class="animate"></div>
-							<h1>营收信息</h1>
-						</div>
-						<div>
-							<div class="service_times num_scrolling" style="margin-top: 28px;">
-								累计总收入 <div class="roll_number myfont" id="container2" style="margin-left:8px;"></div>
-								<span class="fr" id="totalMoneyIndex">元</span>
-							</div>
-							<div class="device_failure" style="margin-top:-20px;">
-								<div class="subtitle" id="subtitle7">
-									<h1 style="font-size: 16px;top:21px;">收入分类</h1>
-								</div>
-								<div id="revenue_statistics" style="height:200px;width:100%;"></div>
-							</div>
-						</div>
-					</div>
-					<div class="content" style="padding-left: 3%;">
-						<div class="mt20">
-							<div class="revenue_operation" style="margin-top: 22px;">
-								<ul class="data_list otherIncomeRateUl">
-									<li style="width:70%;background: linear-gradient(to right,#47D3FF, #00B4FF);"></li>
-									<li style="width:30%;background: linear-gradient(to right,#FFAB00, #FFDB65);"></li>
-								</ul>
-								<div class="power_value">公交:<span class="teamIncomeRate myfont"></span>
-									<p style="float: right;">其他:<span style="color:#E79E26;" class="otherIncomeRate myfont"></span></p>
-								</div>
-							</div>
-							<div class="revenue_operation mt20">
-								<ul class="data_list otherBalanceRateUl">
-									<li style="width:70%;background: linear-gradient(to right,#47D3FF, #00B4FF);"></li>
-									<li style="width:30%;background: linear-gradient(to right,#FFAB00, #FFDB65);"></li>
-								</ul>
-								<div class="power_value">充电:<span class="powerBalanceRate myfont"></span>
-									<p style="float: right;">其他:<span style="color:#E79E26;" class="otherBalanceRate myfont"></span></p>
-								</div>
-							</div>
-						</div>
-						<div class="trend" style="margin-top:0px;">
-							<ul>
-								<li class="active" style="width:40%;">总收入趋势</li>
-								<li style="padding-left: 0;">非公交总收入趋势</li>
-							</ul>
-							<div id="trend1" style="height:168px;width:100%;" class="trendechart"></div>
-							<div id="trend2" style="height:168px;width:266px;display: none;" class="trendechart"></div>
-						</div>
-					</div>
-				</section>
-			</div>
-			
-			<div style="position:absolute;left:0;top:9px;">
-				<img src="./img/left.png" alt="">
-			</div>
-			<div style="position:absolute;right:0;top:9px;">
-				<img src="./img/right.png" alt="">
-			</div>
-			<div style="position:absolute;left:62px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
-            <div style="position:absolute;right:54px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
-            <div style="position:absolute;left:62px;bottom:18px;width: 1806px;height: 2px;background: #256CF9;z-index:9999;"></div>
-		</div>
 
-		<script src="./js/jquery.min.js" type="text/javascript"></script>
-		<script src="./js/echarts.min.js" type="text/javascript"></script>
-		<script src="./js/gz.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>广州公交新能源-如约充电-站点总览</title>
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="stylesheet" href="./css/site-center.css">
+  <link rel="stylesheet" type="text/css" href="./css/component.css" />
+  <link rel="stylesheet" type="text/css" href="./css/custom-bars.css" />
+  <style>
+    #service_times .bar .bar-face {
+      width: 262px;
+      height: 10px;
+      bottom: 82px;
+      left: -4px;
+    }
 
-		<script defer src="./js/clock.js" type="text/javascript"></script>
-		<script src="//webapi.amap.com/maps?v=1.4.14&key=5f127d547058d4c7a587a901ccc121a8&plugin=AMap.ControlBar"></script>
-		<script src="./js/mycharts.js" type="text/javascript"></script>
-		<script src="js/Getindexmin.js" type="text/javascript" charset="utf-8"></script>
-		<script src="./js/lottie.js" type="text/javascript"></script>
+    #service_times .bar .bar-face.face-position.left {
+      width: 10px;
+      transform: rotateX(-90deg) rotateY(-90deg) translateX(-10px) translateZ(6px);
+      background-color: transparent;
+    }
 
-		<script src="./js/getanimate.js" type="text/javascript" charset="utf-8"></script>
-		<script src="./js/TweenLite.min.js" type="text/javascript"></script>
-		<script src="./js/lem_counter.js" type="text/javascript"></script>
+    #service_times .bar .bar-face.face-position.right {
+      width: 10px;
+      right: 97px;
+      left: auto;
+      transform: rotateX(-90deg) rotateY(94deg) translateX(8px);
+    }
 
-		<script>
-			let equipmentParams = {
-                container: document.getElementById("equipment"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/equipment/data.json"
-            }
-            let equipmentAnim = lottie.loadAnimation(equipmentParams);
+    #service_times .bar .bar-face.face-position.back {
+      transform: rotateX(-78deg) rotateY(0deg) translateZ(-16px);
+    }
 
-            let serviceParams = {
-                container: document.getElementById("service"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/service/data.json"
-            }
-            let serviceAnim = lottie.loadAnimation(serviceParams);
+    #service_times .bar .bar-face.face-position.roof {
+      transform: translateZ(10px);
+    }
 
-            let incomeParams = {
-                container: document.getElementById("income"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/income/data.json"
-            }
-            let incomeAnim = lottie.loadAnimation(incomeParams);
+    #service_times .bar.red .bar-face,
+    .bar.red[aria-valuenow='0'] .face-position.right {
+      background-color: rgba(233, 173, 76, 0.4);
+    }
 
-            let userParams = {
-                container: document.getElementById("user"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/user/data.json"
-            }
-			let userAnim = lottie.loadAnimation(userParams);
-			
-			let bgParams = {//标题背景
-                container: document.getElementById("title_bg"),
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: "/resources/screen/expoScreen/animation/bg/data.json"
-            }
-			let bgAnim = lottie.loadAnimation(bgParams);
-			//bgAnim.setSpeed(1);
+    #service_times .bar.heat-gradient .percentage:before {
+      background: rgba(124, 226, 231, 0.9);
+    }
 
-			subtitle1 = document.getElementById("subtitle1");
-			subtitle2 = document.getElementById("subtitle2");
-			subtitle3 = document.getElementById("subtitle3");
-			subtitle4 = document.getElementById("subtitle4");
-			subtitle5 = document.getElementById("subtitle5");
-			subtitle6 = document.getElementById("subtitle6");
-			subtitle7 = document.getElementById("subtitle7");
-			path = "/resources/screen/expoScreen/animation/subtitle/data.json"
-			let subtitleParams1 = {//副标题
-				container: subtitle1,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim1 = lottie.loadAnimation(subtitleParams1);
-			let subtitleParams2 = {//副标题
-				container: subtitle2,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim2 = lottie.loadAnimation(subtitleParams2);
-			let subtitleParams3 = {//副标题
-				container: subtitle3,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim3 = lottie.loadAnimation(subtitleParams3);
-			let subtitleParams4 = {//副标题
-				container: subtitle4,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim4 = lottie.loadAnimation(subtitleParams4);
-			let subtitleParams5 = {//副标题
-				container: subtitle5,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim5 = lottie.loadAnimation(subtitleParams5);
-			let subtitleParams6 = {//副标题
-				container: subtitle6,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim6 = lottie.loadAnimation(subtitleParams6);
-			let subtitleParams7 = {//副标题
-				container: subtitle7,
-				renderer: "svg",
-				loop: true,
-				autoplay: true,
-				path: path
-			}
-			let subtitleAnim7 = lottie.loadAnimation(subtitleParams7);
-			
-			$('#part').load('./site-overview.html', function() {
+    .animate {
+      width: 54px;
+      display: inline-block;
+      overflow: hidden;
+      transform: translate3d(0, 0, 0);
+      position: absolute;
+      top: 4px;
+    }
 
-				$("#income_overview").click(function() {
-					$('#part').load('./income-overview.html',function(){
-						$.myAnimate.incomeAnimate();
-					});
-				})
+    .animate_inside {
+      width: 55px;
+      height: 55px;
+      position: absolute;
+    }
 
-				$("#user_overview").click(function() {
-					$('#part').load('./user-overview.html',function(){
-						$.myAnimate.userAnimate();
-					});
-				})
+    .title_bg image {
+      width: 1651px !important;
+      height: 117px !important;
+    }
+  </style>
+</head>
 
-				$("#site_overview").click(function() {
-					$('#part').load('./site-overview.html',function(){
-						$.myAnimate.siteAnimate();
-					});
-				})
+<body class="scaled">
+  <div class="main">
+    <div id="title_bg" style="width:1651px; height: 117px; position: absolute;top:-7px;left:136px;z-index:9999;"></div>
+    <div
+      style="width:1038px !important;height:144px !important;background: linear-gradient(to top,rgba(7, 27, 77,0), rgba(2, 0, 66,1));position: absolute;top:0px;left:441px;z-index:999;">
+    </div>
+    <time id="time" style="z-index:999;"></time>
 
-				$("#income_panorama").click(function() {
-					$('#part').load('./income-overview.html');
-				})
+    <div class="part_1 fl">
+      <section class="site site1 fl">
+        <div class="site-title">
+          <div id="equipment" class="animate"></div>
+          <h1>设备功率</h1>
+        </div>
+        <div class="total_power">
+          <div class="power_total">总功率<span class="allPower myfont"></span><span style="font-size: 16px;"
+              id="allPowerDw">kw</span><span
+              style="font-size:32px;color:#8BC6FB;margin-left:0;font-weight: 500;">/</span>实时<span
+              class="realTimePower myfont"></span><span style="font-size: 16px;">kw</span></div>
+          <div style="width:88%;height:65px;margin-left:4px;position:relative;top:-35px;">
+            <div class="progress-factor flexy-item">
+              <div class="progress-bar">
+                <div class="bar has-rotation has-colors red heat-gradient" role="progressbar" aria-valuenow="0"
+                  aria-valuemin="0" aria-valuemax="100" id="chargingPercentBar">
+                  <div class="bar-face face-position roof percentage"></div>
+                  <div class="bar-face face-position back percentage"></div>
+                  <div class="bar-face face-position floor percentage volume-lights"></div>
+                  <div class="bar-face face-position left"></div>
+                  <div class="bar-face face-position right" style="background-color: rgba(124, 226, 231, 0.4);"></div>
+                  <div class="bar-face face-position front percentage volume-lights shine"></div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="position:absolute;top:46px;left: 100%;color: #2BDEF7;font-size: 20px;font-weight: 600;transform:rotateZ(90deg);"
+              class="chargingPercentBar1 myfont"></div>
+          </div>
+        </div>
+        <div class="charging_capacity" style="margin-top: -24px;">
+          <div class="subtitle" id="subtitle1">
+            <h1>总充电量122</h1>
+          </div>
+          <div class="capacity_total">
+            <p><span class="sumPower myfont"></span> <span style="font-size: 16px;" id="sumPowerDw">kwh</span></p>
+            <div id="charging" style="height:80px;width:80px;top:0px;right:20px;"></div>
+          </div>
+          <div id="chart" style="height:150px;width:100%;"></div>
+        </div>
+        <div class="device_failure" style="margin-top:0px;">
+          <div class="subtitle" id="subtitle2">
+            <h1>故障情况</h1>
+          </div>
+          <div class="failure_data" style="margin-top:-6px;">
+            <div class="month_failure">
+              <p>故障率: <span style="font-size: 28px;font-weight:600;color:#EA5558;" id="faultCountrate"
+                  class="myfont"></span></p>
+            </div>
+            <div class="month_failure">
+              <p>月故障数: <span><span style="font-size: 28px;font-weight:600;" class="faultCount myfont"></span>个</span>
+              </p>
+            </div>
+            <div id="failure1" style="height:150px;width:100%;"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="part_2 fl" id="part"></div>
+    <div class="part_3 fl">
+      <section class="site site2 fl">
+        <div class="site-title">
+          <div id="user" class="animate"></div>
+          <h1>会员信息</h1>
+        </div>
+        <div class="mt20">
+          <div class="service_times">
+            累计服务用户数 <div class="roll_number myfont" id="container1" style="margin-left:-2px;"></div>
+            <span class="fr" id="totalServiceMemberNumIndex">个</span>
+          </div>
+          <div class="power_value" style="margin-top:-4px;">车队:<span class="teamCount myfont"
+              style="font-size: 18px;"></span>
+            <p style="float: right;">个人:<span class="personageCount myfont" style="font-size: 18px;"></span></p>
+          </div>
+          <div class="operational_data">
+            <ul class="data_list1" style="width: 101%;">
+              <li style="width:79%;"><span
+                  style="width:100%;background: linear-gradient(to right,#94A8C4, #C2D9E2);"></span></li>
+              <li style="width:11%;"><span
+                  style="width:100%;background: linear-gradient(to right,#FFAC01, #FFDA64);"></span></li>
+              <li style="width:5%;"><span
+                  style="width:100%;background: linear-gradient(to right,#FED685, #FFEFC1);"></span></li>
+              <li style="width:3%;"><span
+                  style="width:100%;background: linear-gradient(to right,#D5D9E0, #C7CCD6);"></span></li>
+              <li style="width:0%;"><span
+                  style="width:100%;background: linear-gradient(to right,#2759B9, #4183FE);"></span></li>
+            </ul>
+            <ul class="data_list2" style="height:30px;">
+              <li style="background-image:-webkit-linear-gradient(top,#94A8C4, #C2D9E2);">银卡 <span
+                  class="silverRate myfont">0</span></li>
+              <li style="background-image:-webkit-linear-gradient(top,#FFAC01, #FFDA64);">金卡 <span
+                  class="goldRate myfont">0</span></li>
+              <li style="background-image:-webkit-linear-gradient(top,#FED685, #FFEFC1);">白金 <span
+                  class="platinumRate myfont">0</span></li>
+              <li style="background-image:-webkit-linear-gradient(top,#D5D9E0, #C7CCD6);">钻石 <span
+                  class="diamondRate myfont">0</span></li>
+              <li style="background-image:-webkit-linear-gradient(top,#2759B9, #4183FE);">黑金 <span
+                  class="blackGoldRate myfont">0</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="growth_trend" style="margin-top:12px;">
+          <div class="subtitle" id="subtitle5">
+            <h1>会员发展趋势</h1>
+          </div>
+          <div id="growth_trend" style="height:150px;width:100%;"></div>
+        </div>
+        <div class="growth_trend" style="margin-top: -10px;">
+          <div class="subtitle" id="subtitle6">
+            <h1>会员活跃情况</h1>
+          </div>
+          <div id="active_trend" style="height:150px;width:100%;"></div>
+        </div>
+      </section>
+    </div>
+    <div class="part_4">
+      <section class="site site3 fl" style="margin-left:4%;width: 90%;">
+        <div class="content" style="padding-right: 3%;">
+          <div class="site-title">
+            <div id="service" class="animate"></div>
+            <h1>充电服务</h1>
+          </div>
+          <div style="margin-top: 22px;">
+            <div class="service_times num_scrolling">
+              累计服务次数 <div class="roll_number myfont" id="container3" style="margin-left: -3px;"></div>
+              <span class="fr" id="serviceTotalCountIndex">次</span>
+            </div>
+            <div class="charging_capacity" style="margin-top:-28px;">
+              <div class="subtitle" id="subtitle3">
+                <h1 style="font-size: 16px;top:21px;">总充电时长</h1>
+              </div>
+              <div class="capacity_total">
+                <p style="text-align: center;"><span class="totalChargingTime myfont"></span><b>小时</b></p>
+              </div>
+              <div class="capacity_bg" style="height:140px;width:100%;margin-top: 0px;">
+                <div class="fl" style="width:52%;">
+                  <p style="color:#8BC6FB;">公交<span style="color:#2BDEF7;"><span style="font-size: 18px;"
+                        class="AverageTimeForGong myfont">2.56</span>小时/次</span></p>
+                  <p style="margin-top:6px;"><span style="font-size:30px;"
+                      class="gongChargingTime myfont">0</span><b>小时</b></p>
+                </div>
+                <div class="fl" style="width:43%;">
+                  <p style="color:#8BC6FB;">其他<span style="color:#2BDEF7;"><span style="font-size: 18px;"
+                        class="AverageTimeForOther myfont">1.5</span>小时/次</span></p>
+                  <p style="margin-top:6px;"><span style="font-size:30px;"
+                      class="otherChargingTime myfont"></span><b>小时</b></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content" style="padding-left: 3%;">
+          <div class="mt20">
+            <div style="width:100%;height:45px;" id="service_times">
+              <div class="power_value"><span class="gongPercent myfont">0</span>
+                <p style="float: right;"><span style="color:#E79E26;" class="anotherPercent myfont">0</span></p>
+              </div>
+              <div class="progress-factor flexy-item" style="position: relative;top:-15px;">
+                <div class="progress-bar">
+                  <div class="bar has-rotation has-colors red heat-gradient" role="progressbar" aria-valuenow="0"
+                    aria-valuemin="0" aria-valuemax="100" id="gongPercentBar">
+                    <div class="bar-face face-position roof percentage"></div>
+                    <div class="bar-face face-position back percentage"></div>
+                    <div class="bar-face face-position floor percentage volume-lights"></div>
+                    <div class="bar-face face-position left"></div>
+                    <div class="bar-face face-position right"></div>
+                    <div class="bar-face face-position front percentage volume-lights shine"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="power_value">公交:<span class="serviceGongCount myfont"></span>
+              <p style="float: right;">其他:<span style="color:#E79E26;" class="serviceAnotherCarCount myfont">0次</span>
+              </p>
+            </div>
+          </div>
+          <div class="device_failure" style="margin-top:3px;">
+            <div class="subtitle" id="subtitle4">
+              <h1 style="font-size: 16px;top:21px;">充电服务排名</h1>
+            </div>
+            <div class="site_service" style="margin-top:10px;">
+              <ul>
+                <li>
+                  <div class="site_number"><span class="site_number_1"
+                      style="background: url('./img/num1.png') no-repeat;background-size: 100% 100%;">1</span></div>
+                  <div class="site_content rankList">
+                    <div class="site_name">
+                      <h1 class="fl ellipse fw500">---</h1>
+                      <p class="fr"><span style="font-size:20px;" class="chargeCount myfont">0</span><span>次</span></p>
+                    </div>
+                    <div class="site_num mt1">
+                      累计充电次数:<span class="mr40 allChargeCount myfont">0次</span>枪数:<span
+                        class="gunCount myfont">0支</span>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="site_number"><span class="site_number_1"
+                      style="background: url('./img/num2.png') no-repeat;background-size: 100% 100%;">2</span></div>
+                  <div class="site_content rankList">
+                    <div class="site_name">
+                      <h1 class="fl ellipse fw500">---</h1>
+                      <p class="fr"><span style="font-size:20px;" class="chargeCount myfont">0</span><span>次</span></p>
+                    </div>
+                    <div class="site_num mt1">
+                      累计充电次数:<span class="mr40 allChargeCount myfont">0次</span>枪数:<span
+                        class="gunCount myfont">0支</span>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="site_number"><span class="site_number_1"
+                      style="background: url('./img/num3.png') no-repeat;background-size: 100% 100%;">3</span></div>
+                  <div class="site_content rankList">
+                    <div class="site_name">
+                      <h1 class="fl ellipse fw500">---</h1>
+                      <p class="fr"><span style="font-size:20px;" class="chargeCount myfont">0</span><span>次</span></p>
+                    </div>
+                    <div class="site_num mt1">
+                      累计充电次数:<span class="mr40 allChargeCount myfont">0次</span>枪数:<span
+                        class="gunCount myfont">0支</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="part_5">
+      <section class="site site4 fr" style="margin: 0 2%;width: 94%;">
+        <div class="content" style="padding-right: 3%;">
+          <div class="site-title">
+            <div id="income" class="animate"></div>
+            <h1>营收信息</h1>
+          </div>
+          <div>
+            <div class="service_times num_scrolling" style="margin-top: 28px;">
+              累计总收入 <div class="roll_number myfont" id="container2" style="margin-left:8px;"></div>
+              <span class="fr" id="totalMoneyIndex">元</span>
+            </div>
+            <div class="device_failure" style="margin-top:-20px;">
+              <div class="subtitle" id="subtitle7">
+                <h1 style="font-size: 16px;top:21px;">收入分类</h1>
+              </div>
+              <div id="revenue_statistics" style="height:200px;width:100%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="content" style="padding-left: 3%;">
+          <div class="mt20">
+            <div class="revenue_operation" style="margin-top: 22px;">
+              <ul class="data_list otherIncomeRateUl">
+                <li style="width:70%;background: linear-gradient(to right,#47D3FF, #00B4FF);"></li>
+                <li style="width:30%;background: linear-gradient(to right,#FFAB00, #FFDB65);"></li>
+              </ul>
+              <div class="power_value">公交:<span class="teamIncomeRate myfont"></span>
+                <p style="float: right;">其他:<span style="color:#E79E26;" class="otherIncomeRate myfont"></span></p>
+              </div>
+            </div>
+            <div class="revenue_operation mt20">
+              <ul class="data_list otherBalanceRateUl">
+                <li style="width:70%;background: linear-gradient(to right,#47D3FF, #00B4FF);"></li>
+                <li style="width:30%;background: linear-gradient(to right,#FFAB00, #FFDB65);"></li>
+              </ul>
+              <div class="power_value">充电:<span class="powerBalanceRate myfont"></span>
+                <p style="float: right;">其他:<span style="color:#E79E26;" class="otherBalanceRate myfont"></span></p>
+              </div>
+            </div>
+          </div>
+          <div class="trend" style="margin-top:0px;">
+            <ul>
+              <li class="active" style="width:40%;">总收入趋势</li>
+              <li style="padding-left: 0;">非公交总收入趋势</li>
+            </ul>
+            <div id="trend1" style="height:168px;width:100%;" class="trendechart"></div>
+            <div id="trend2" style="height:168px;width:266px;display: none;" class="trendechart"></div>
+          </div>
+        </div>
+      </section>
+    </div>
 
-				$("#income_streetscape").click(function() {
-					$('#part').load('./income-overview-streetscape.html');	
-				})
-				
-				$("#site_streetscape").click(function() {
-					$('#part').load('./site-overview-streetscape.html');
-				})
+    <div style="position:absolute;left:0;top:9px;">
+      <img style="display: block;height: 1136px;" src="./img/left.png" alt="">
+    </div>
+    <div style="position:absolute;right:0;top:9px;">
+      <img style="display: block;height: 1136px;" src="./img/right.png" alt="">
+    </div>
+    <div style="position:absolute;left:62px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
+    <div style="position:absolute;right:54px;top:11px;width: 474px;height: 2px;background: #256CF9;z-index:9999;"></div>
+    <div style="position:absolute;left:62px;bottom:18px;width: 1806px;height: 2px;background: #256CF9;z-index:9999;">
+    </div>
+  </div>
 
-				$("#site_panorama").click(function() {
-					$('#part').load('./site-overview.html');
-				})
+  <script src="./js/jquery.min.js" type="text/javascript"></script>
+  <script src="./js/echarts.min.js" type="text/javascript"></script>
+  <script src="./js/gz.js"></script>
 
-				$("#user_panorama").click(function() {
-					$('#part').load('./user-overview.html');
-				})
+  <script defer src="./js/clock.js" type="text/javascript"></script>
+  <script src="//webapi.amap.com/maps?v=1.4.14&key=5f127d547058d4c7a587a901ccc121a8&plugin=AMap.ControlBar"></script>
+  <script src="./js/mycharts.js" type="text/javascript"></script>
+  <script src="js/Getindexmin.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./js/lottie.js" type="text/javascript"></script>
 
-				$("#user_streetscape").click(function() {
-					$('#part').load('./user-overview.html');
-				})
+  <script src="./js/getanimate.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./js/TweenLite.min.js" type="text/javascript"></script>
+  <script src="./js/lem_counter.js" type="text/javascript"></script>
 
-				$(".trend>ul>li").click(function() {
-					$(this).addClass("active");
-					$(this).siblings().removeClass("active");
-					$('.trendechart').toggle();
+  <script>
+    let equipmentParams = {
+      container: document.getElementById("equipment"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/equipment/data.json"
+    }
+    let equipmentAnim = lottie.loadAnimation(equipmentParams);
 
-					trend = $(".trend>ul").css("background-image").split("\"")[1];
-					length = trend.split("/").length;
-					imgUrl = trend.split("/")[length-1];
+    let serviceParams = {
+      container: document.getElementById("service"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/service/data.json"
+    }
+    let serviceAnim = lottie.loadAnimation(serviceParams);
+
+    let incomeParams = {
+      container: document.getElementById("income"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/income/data.json"
+    }
+    let incomeAnim = lottie.loadAnimation(incomeParams);
+
+    let userParams = {
+      container: document.getElementById("user"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/user/data.json"
+    }
+    let userAnim = lottie.loadAnimation(userParams);
+
+    let bgParams = {//标题背景
+      container: document.getElementById("title_bg"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "/resources/screen/expoScreen/animation/bg/data.json"
+    }
+    let bgAnim = lottie.loadAnimation(bgParams);
+    //bgAnim.setSpeed(1);
+
+    subtitle1 = document.getElementById("subtitle1");
+    subtitle2 = document.getElementById("subtitle2");
+    subtitle3 = document.getElementById("subtitle3");
+    subtitle4 = document.getElementById("subtitle4");
+    subtitle5 = document.getElementById("subtitle5");
+    subtitle6 = document.getElementById("subtitle6");
+    subtitle7 = document.getElementById("subtitle7");
+    path = "/resources/screen/expoScreen/animation/subtitle/data.json"
+    let subtitleParams1 = {//副标题
+      container: subtitle1,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim1 = lottie.loadAnimation(subtitleParams1);
+    let subtitleParams2 = {//副标题
+      container: subtitle2,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim2 = lottie.loadAnimation(subtitleParams2);
+    let subtitleParams3 = {//副标题
+      container: subtitle3,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim3 = lottie.loadAnimation(subtitleParams3);
+    let subtitleParams4 = {//副标题
+      container: subtitle4,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim4 = lottie.loadAnimation(subtitleParams4);
+    let subtitleParams5 = {//副标题
+      container: subtitle5,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim5 = lottie.loadAnimation(subtitleParams5);
+    let subtitleParams6 = {//副标题
+      container: subtitle6,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim6 = lottie.loadAnimation(subtitleParams6);
+    let subtitleParams7 = {//副标题
+      container: subtitle7,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: path
+    }
+    let subtitleAnim7 = lottie.loadAnimation(subtitleParams7);
+
+    $('#part').load('./site-overview.html', function () {
+
+      $("#income_overview").click(function () {
+        $('#part').load('./income-overview.html', function () {
+          $.myAnimate.incomeAnimate();
+        });
+      })
+
+      $("#user_overview").click(function () {
+        $('#part').load('./user-overview.html', function () {
+          $.myAnimate.userAnimate();
+        });
+      })
+
+      $("#site_overview").click(function () {
+        $('#part').load('./site-overview.html', function () {
+          $.myAnimate.siteAnimate();
+        });
+      })
+
+      $("#income_panorama").click(function () {
+        $('#part').load('./income-overview.html');
+      })
+
+      $("#income_streetscape").click(function () {
+        $('#part').load('./income-overview-streetscape.html');
+      })
+
+      $("#site_streetscape").click(function () {
+        $('#part').load('./site-overview-streetscape.html');
+      })
+
+      $("#site_panorama").click(function () {
+        $('#part').load('./site-overview.html');
+      })
+
+      $("#user_panorama").click(function () {
+        $('#part').load('./user-overview.html');
+      })
+
+      $("#user_streetscape").click(function () {
+        $('#part').load('./user-overview.html');
+      })
+
+      $(".trend>ul>li").click(function () {
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
+        $('.trendechart').toggle();
+
+        trend = $(".trend>ul").css("background-image").split("\"")[1];
+        length = trend.split("/").length;
+        imgUrl = trend.split("/")[length - 1];
 
 
-					if(imgUrl =='tab1.png'){
-						$(".trend>ul").css("background-image","url('./img/tab2.png')");
-					}else{
-						$(".trend>ul").css("background-image","url('./img/tab1.png')");
-					}
+        if (imgUrl == 'tab1.png') {
+          $(".trend>ul").css("background-image", "url('./img/tab2.png')");
+        } else {
+          $(".trend>ul").css("background-image", "url('./img/tab1.png')");
+        }
 
-				})
-				$.myAnimate.siteAnimate();
-			});
-			setTimeout(function() {
-				$('.part_1').css('left', "2%");
-				$('.part_3').css('left', "80%");
-				$('.part_4').css('bottom', "40px");
-				$('.part_5').css('bottom', "40px");
-			}, 1000)
+      })
+      $.myAnimate.siteAnimate();
+    });
+    setTimeout(function () {
+      $('.part_1').css('left', "2%");
+      $('.part_3').css('left', "80%");
+      $('.part_4').css('bottom', "40px");
+      $('.part_5').css('bottom', "40px");
+    }, 1000)
 
-			var page = window.location.search;
-            if(page=='?page=1'){
-                $('#part').load('./user-overview.html',function(){
-					$.myAnimate.userAnimate();
-				});
-            }
-            if(page=='?page=2'){
-                $('#part').load('./site-overview.html',function(){
-					$.myAnimate.siteAnimate();
-				});
-            } 
-		</script>
-	</body>
+    var page = window.location.search;
+    if (page == '?page=1') {
+      $('#part').load('./user-overview.html', function () {
+        $.myAnimate.userAnimate();
+      });
+    }
+    if (page == '?page=2') {
+      $('#part').load('./site-overview.html', function () {
+        $.myAnimate.siteAnimate();
+      });
+    }
+  </script>
+</body>
+
 </html>

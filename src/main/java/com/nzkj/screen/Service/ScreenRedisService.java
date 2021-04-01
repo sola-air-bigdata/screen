@@ -30,4 +30,22 @@ public interface ScreenRedisService {
     Map<String, Object> doGetStationEquipmentInfo(Long stationID);
 
     JSONArray getStationInServiceMapData();
+
+    List<StationDto> getStationDto();
+
+    Map<String, Object> doHistoryTotalCharging();
+
+    List<Map<String, Object>> doGetUserServiceNum(Long stationID);
+
+    Map<String, Object> doGetStationMemData(Long stationID);
+
+    List<Map<String, Object>> getMemberAddByMonth (Long stationID);
+
+    List<Map<String, Object>> getMemberByHours(Long stationId);
+
+    Map<String, Object> getFansProportion(Long stationId);
+
+    List<Map<String, Object>> getConsumptionRanking(Long stationId);
+
+
 }

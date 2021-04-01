@@ -11,9 +11,9 @@ spring:
         max-lifetime: 180000
         connection-timeout: 30000
         connection-test-query: SELECT 1
-        jdbcUrl: jdbc:mysql://106.53.24.142:3306/pile_member?useUnicode=true&serverTimezone=UTC&useSSL=false
+        jdbcUrl: jdbc:mysql://106.55.40.222:3306/pile_member?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123456qqQ...
+        password: 123qqq...A
     config:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.zaxxer.hikari.HikariDataSource
@@ -25,9 +25,9 @@ spring:
         max-lifetime: 180000
         connection-timeout: 30000
         connection-test-query: SELECT 1
-        jdbcUrl: jdbc:mysql://106.53.24.142:3306/pile_config?useUnicode=true&serverTimezone=UTC&useSSL=false
+        jdbcUrl: jdbc:mysql://106.55.40.222:3306/pile_config?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123456qqQ...
+        password: 123qqq...A
     bill:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.zaxxer.hikari.HikariDataSource
@@ -39,9 +39,9 @@ spring:
         max-lifetime: 180000
         connection-timeout: 30000
         connection-test-query: SELECT 1
-        jdbcUrl: jdbc:mysql://106.53.24.142:3306/pile_bill?useUnicode=true&serverTimezone=UTC&useSSL=false
+        jdbcUrl: jdbc:mysql://106.55.40.222:3306/pile_bill?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123456qqQ...
+        password: 123qqq...A
     screen:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.zaxxer.hikari.HikariDataSource
@@ -75,6 +75,6 @@ spring:
 server:
   port: 8091
 
-sellerId: 21
+sellerId: 20
 userId: 1
 expireTime: 60

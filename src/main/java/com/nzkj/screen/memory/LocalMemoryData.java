@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nzkj.screen.Entity.DTO.*;
 
+import com.nzkj.screen.Entity.Pile;
 import com.nzkj.screen.Entity.Station;
 import com.nzkj.screen.mapper.pile.config.IGunMapper;
 import com.nzkj.screen.mapper.pile.config.IPileMapper;
@@ -114,7 +115,7 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 
 	private void updateStation(Long sellerId){
 		List<Station> stations = stationMapper.findBySeller(sellerId);
-		Set<Long> stationIds = null;
+		Set<Long> stationIds = new HashSet<>();
 		for(Station s : stations){
 			StationDto dto = new StationDto();
 			dto.setId(s.getId());
@@ -149,22 +150,7 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 			}
 			sellerStationMap.put(sellerId,stations);
 		}
-//		Set<Long> piles = new HashSet<>(), stationPiles = null;
-//		for(Long stationId: stations) {
-//			stationPiles = stationPileMap.get(stationId);
-//			if(CollectionUtil.isNotEmpty(stationPiles)) {
-//				piles.addAll(stationPiles);
-//			}else{
-//				stationPiles = pileMapper.findPileByStationId(stationId);
-//				if(CollectionUtil.isNotEmpty(stationPiles)){
-//					stationPileMap.put(stationId,stationPiles);
-//					piles.addAll(stationPiles);
-//				}
-//			}
-//		}
-//		if(CollectionUtil.isEmpty(piles)) {
-//			return Collections.emptyList();
-//		}
+
 		final List<String> keys = new ArrayList<>();
 		
 		Set<String> gunKeys = null;
@@ -228,6 +214,8 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		return pileMap.get(pileId);
 	}
 
+
+
 	@Override
 	public List<GunMonitorDto> getGunByPile(Long pileId) {
 		Set<String> gunKeys = pileGunMap.get(pileId);
@@ -236,13 +224,33 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 		}
 		int size = gunKeys.size();
 		List<GunMonitorDto> guns = new ArrayList<>(size);
-		ValueOperations<String, GunMonitorDto> ops = redisJsonTemplate.opsForValue();
 		GunMonitorDto gun = null;
-		for(String gunKey : gunKeys) {
-			gun = ops.get(gunKey);
-			if(gun != null) {
+//		for(String gunKey : gunKeys) {
+//			JSONObject o  = (JSONObject) redisJsonTemplate.opsForValue().get(gunKey);
+//			o.remove("@type");
+//			gun = o.toJavaObject(GunMonitorDto.class);
+//			if(gun != null) {
+//				guns.add(gun);
+//			}
+//		}
+		List<Object> results = StringredisTemplate.executePipelined(new RedisCallback<Object>() {
+			@Override
+			public String doInRedis(RedisConnection conn) throws DataAccessException {
+				conn.openPipeline();
+				for (String key : gunKeys) {
+					conn.get(key.getBytes());
+				}
+				return null;
+			}
+		});
+		for(Object o :results){
+			if(o != null){
+				JSONObject obj = JSONObject.parseObject(o.toString());
+				obj.remove("@type");
+				gun = obj.toJavaObject(GunMonitorDto.class);
 				guns.add(gun);
 			}
+
 		}
 		return guns;
 	}
@@ -265,6 +273,27 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 				stationPileMap.put(stationId,stationPiles);
 				piles.addAll(stationPiles);
 			}
+
+			for(long pileId : stationPiles){
+				guns = gunMapper.findGunNoByPileId(pileId);
+				if(CollectionUtil.isNotEmpty(guns)){
+					Set<String> pileGunKeys = new HashSet<>();
+					for(long gunNo :guns){
+						String gunKey = redisTemp.buildKey(RedisDataEnum.GUNMONITOR, stationId, pileId, gunNo);
+						pileGunKeys.add(gunKey);
+					}
+					pileGunMap.put(pileId,pileGunKeys);
+				}
+
+			}
+
+			List<PileDto> dtos = pileMapper.findPileDtoByStationId(stationId);
+			if(dtos != null){
+				for(PileDto dto : dtos){
+					pileMap.put(dto.getId(),dto);
+				}
+			}
+
 
 			//初始化站点下所有的gunKey
 			String gunKeysCachekey = redisTemp.buildKey(RedisDataEnum.GUNKEYSCACHE, stationId);
@@ -313,11 +342,12 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 						if (monitorvalue != null) {
 //							GunMonitorDto monitorDto = (GunMonitorDto) JSONObject.parse(monitorvalue);
 							JSONObject o = (JSONObject) JSONObject.parse(monitorvalue);
-							o.remove("@type");
-							GunMonitorDto monitorDto = o.toJavaObject(GunMonitorDto.class);
-//							// 充电枪信息统计
-							powerCount += monitorDto.getPower();
-							switch (monitorDto.getGunState()) {
+//							o.remove("@type");
+//							GunMonitorDto monitorDto = o.toJavaObject(GunMonitorDto.class);
+////							// 充电枪信息统计
+//							powerCount += monitorDto.getPower();
+							powerCount += o.getIntValue("power");
+							switch (o.getInteger("realGunState")) {
 								case 3:
 									// 充电中的电枪
 									charging++;
@@ -416,5 +446,12 @@ public class LocalMemoryData extends RedisKeyBuilder implements IMemoryData{
 
 
 
+	private PileDto coverToPileDto(Pile pile){
+		PileDto p = new PileDto();
+		p.setId(pile.getId());
+		p.setPointNum(pile.getPileNum());
+
+		return p;
+	}
 
 }

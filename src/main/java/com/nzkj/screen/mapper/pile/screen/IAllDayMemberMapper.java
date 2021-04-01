@@ -29,7 +29,7 @@ public interface IAllDayMemberMapper extends BaseMapper<AllDayMember> {
      * @param date
      * @return
      */
-    @Select("select   day_nbus_i_actual_balance_count_rank,   n_member_name from   t_all_day_member_table  where  l_seller_id = #{sellerId} and STR_TO_DATE(a.d_day_time, '%Y-%m-%d') = #{date} order by   day_nbus_i_actual_balance_count_rank desc limit 3")
+    @Select("select   day_nbus_i_actual_balance_count_rank,   n_member_name from   t_all_day_member_table  where  l_seller_id = #{sellerId} and STR_TO_DATE(d_day_time, '%Y-%m-%d') = #{date} order by   day_nbus_i_actual_balance_count_rank desc limit 3")
     List<AllDayMember>getdayTransIncomeRank(@Param("sellerId") Long l_seller_id, @Param("date") String date);
 
 

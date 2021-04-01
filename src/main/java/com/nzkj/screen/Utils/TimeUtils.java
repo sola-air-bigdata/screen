@@ -626,5 +626,37 @@ public class TimeUtils {
 		map.put("thisEnd", ss);
 		return map;
     }
+
+	/**
+	 * 根据现在的时间获取前12个月的日期
+	 * @author fqg
+	 * @return list
+	 */
+	public static List<String> getNowOfTwelveMonth(){
+		List<String> list = new ArrayList<>();
+		Calendar c = Calendar.getInstance();
+		int year  = c.get(Calendar.YEAR);
+		int month = c.get(Calendar.MONTH)+1;
+		for (int i = 0; i < 12; i++) {
+			String time = "";
+			if(month == 0){
+				month = 12;
+				year = year -1;
+				time = year +"-"+month;
+				list.add(time);
+				month = month -1;
+			}else {
+				if(month > 9){
+					time = year +"-"+month;
+					list.add(time);
+				}else {
+					time = year +"-0"+month;
+					list.add(time);
+				}
+				month = month -1;
+			}
+		}
+		return list;
+	}
     
 }

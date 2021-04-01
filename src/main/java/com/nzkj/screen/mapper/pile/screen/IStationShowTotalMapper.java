@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -20,8 +21,8 @@ import java.util.List;
 public interface IStationShowTotalMapper extends BaseMapper<StationShowTotal> {
 
 
-    @Select("select * from station_show_total_table where l_station_id = #{stationId}")
-    StationShowTotal get(@Param("stationId")Long l_station_id);
+    @Select("select * from station_show_total_table where l_station_id = #{stationId} and l_seller_id = #{sellerId}")
+    StationShowTotal get(@Param("stationId")Long l_station_id,@Param("sellerId")Long l_seller_id);
 
 
     @Select("select * from station_show_total_table where l_station_id = #{stationId} and l_seller_id = #{id} ")
@@ -40,5 +41,9 @@ public interface IStationShowTotalMapper extends BaseMapper<StationShowTotal> {
      */
     @Select("select total_station_money_count from station_show_total_table where l_station_id = #{stationId} ")
     Long getBalanceById(@Param("stationId")Long l_station_id);
+
+
+    @Select("SELECT total_station_money_count - total_station_team_menoy_count from  station_show_total_table  where l_station_id = #{stationId} and l_seller_id = #{id}")
+    BigInteger getUserTotalCharge(@Param("stationId")Long l_station_id,@Param("id")Long l_seller_id);
 
 }

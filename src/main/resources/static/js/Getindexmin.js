@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
 
 	var p1 = echarts.init(document.getElementById("charging")); //累计充电量公交占比
 	// var p2 = echarts.init(document.getElementById("failure")); // 设备故障率 公交占比
@@ -87,7 +87,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var allPower = parseInt(res.allPower); //总功率
 				if (allPower > 10000) {
 					allPower = parseFloat((allPower / 10000).toFixed(2));
@@ -99,8 +99,8 @@ $(function() {
 				}
 				$('.allPower').lemCounter({
 					value_to: allPower,
-					value_from:allPower_f
-				});	
+					value_from: allPower_f
+				});
 				allPower_f = allPower;
 			}
 		})
@@ -111,8 +111,8 @@ $(function() {
 			url: "/statistic/screenNewAjax/deviceProblemData.json",
 			type: "post",
 			dataType: "json",
-			data: {}, 
-			success: function(res) {
+			data: {},
+			success: function (res) {
 				var falutMap = res.falutMap; ////故障曲线图
 				var faultCountList = falutMap.faultCountList;
 				var falutMaptimeList = falutMap.timeList;
@@ -133,22 +133,22 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var realTimePower = res.realTimePower; //设备运营 实时功率
 				$('.realTimePower').text(realTimePower);
 				var chargingPercent = res.chargingPercent; ///显示当前充电电桩的百分比值
 				if (chargingPercent == undefined) {
 					chargingPercent = 0;
 				}
-				var chargingPercentceil=Math.ceil(chargingPercent);
+				var chargingPercentceil = Math.ceil(chargingPercent);
 				$('#chargingPercentBar').attr("aria-valuenow", chargingPercentceil);
 				$('.chargingPercentBar1').text(chargingPercent + '%');
 				$('.sitechargingPercent').text(chargingPercent);
 
 				$('.realTimePower').lemCounter({
 					value_to: realTimePower,
-					value_from:realTimePower_f
-				});	
+					value_from: realTimePower_f
+				});
 				realTimePower_f = realTimePower;
 			}
 		})
@@ -161,30 +161,31 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
-				var team12ChargingData = res.team12ChargingData; //2 累计充电量柱状图
-				b1.setOption(barChartOptions(team12ChargingData, 'K \n w \n h ', '公交车', '其他', true, 75)); //累计充电量柱状图
-				var carChargingPercent = parseFloat(res.carChargingPercent).toFixed(2); //累计充电量公交占比
-				p1.setOption(pieChartOptions('#2BDEF7', '#fff', carChargingPercent, 12, 20, 12, 600, "公交占比")); // 累计充电量公交占比
-				var sumPower = parseFloat(res.sumPower);
-				if (sumPower > 10000) {
-					sumPower = parseFloat((res.sumPower / 10000).toFixed(2));
-					$('.sumPower').text(sumPower);
-					$('#sumPowerDw').text("万KWH");
-				} else {
-					$('.sumPower').text(sumPower);
-					$('#sumPowerDw').text("KWH");
-				}
+			success: function (res) {
+					var team12ChargingData = res.team12ChargingData; //2 累计充电量柱状图
+					b1.setOption(barChartOptions(team12ChargingData, 'K \n w \n h ', '公交车', '其他', true, 75)); //累计充电量柱状图
+					var carChargingPercent = parseFloat(res.carChargingPercent).toFixed(2); //累计充电量公交占比
+					p1.setOption(pieChartOptions('#2BDEF7', '#fff', carChargingPercent, 12, 20, 12, 600, "公交占比")); // 累计充电量公交占比
+					var sumPower = parseFloat(res.sumPower);
+					if (sumPower > 10000) {
+						sumPower = parseFloat((res.sumPower / 10000).toFixed(2));
+						$('.sumPower').text(sumPower);
+						$('#sumPowerDw').text("万KWH");
+					} else {
+						$('.sumPower').text(sumPower);
+						$('#sumPowerDw').text("KWH");
+					}
 
-				$('.sumPower').lemCounter({
-					value_to: sumPower,
-					value_from:sumPower_f
-				});	
-				sumPower_f = sumPower;
+					$('.sumPower').lemCounter({
+						value_to: sumPower,
+						value_from: sumPower_f
+					});
+					sumPower_f = sumPower;
+
 			}
 		})
 	}
-	window.addEventListener("resize", function() {
+	window.addEventListener("resize", function () {
 		b1.resize();
 	});
 
@@ -195,7 +196,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var {
 					otherBalanceRate,
 					otherIncomeRate,
@@ -230,7 +231,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var {
 					app,
 					card,
@@ -295,7 +296,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var totalIncomeTrend = res.totalIncomeTrend; //总收入趋势
 				var notTotalIncomeTrend = res.notTotalIncomeTrend; //非公交总收入趋势
 				b2.setOption(barChartOptions(totalIncomeTrend, '', '充电', '其他', true, 75));
@@ -311,7 +312,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var {
 					totalMoney,
 					totalServiceMemberNum,
@@ -320,18 +321,18 @@ $(function() {
 				if (serviceTotalCount > 999999) {
 					serviceTotalCount = parseInt(serviceTotalCount / 10000);
 					$('#serviceTotalCountIndex').text('万次');
-				}else{
-					serviceTotalCount=parseInt(serviceTotalCount);
+				} else {
+					serviceTotalCount = parseInt(serviceTotalCount);
 					$('#serviceTotalCountIndex').text('次');
 				}
 				if (totalServiceMemberNum > 999999) {
 					totalServiceMemberNum = parseInt(totalServiceMemberNum / 10000);
 					$('#totalServiceMemberNumIndex').text('万个');
-				}else{
+				} else {
 					totalServiceMemberNum = parseInt(totalServiceMemberNum);
 					$('#totalServiceMemberNumIndex').text('个');
 				}
-				
+
 				if (parseFloat(totalMoney) > 999999) {
 					totalMoney = parseInt(parseFloat(totalMoney) / 10000);
 					$('#totalMoneyIndex').text('万元');
@@ -351,7 +352,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var rankList = res.rankList; //站点服务频率排行 
 				for (let i = 0; i < rankList.length; i++) {
 					$('.rankList').eq(i).find("h1").text(rankList[i].stationName);
@@ -380,7 +381,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				var memberData = res.memberData;
 				$('.silverRate').text(memberData.silverRate + '%');
 				$('.platinumRate').text(memberData.platinumRate + '%');
@@ -405,13 +406,13 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				// 总用户增长趋势 曲线图
 				var memberAddTrend = res.memberAddTrend;
-				line2.setOption(lineChartOptions1(memberAddTrend.timeList, memberAddTrend.teamList, memberAddTrend.personageList,40)); // 总用户增长趋势 
+				line2.setOption(lineChartOptions1(memberAddTrend.timeList, memberAddTrend.teamList, memberAddTrend.personageList, 40)); // 总用户增长趋势 
 				//用户活跃量趋势memberActiveTrend
 				var memberActiveTrend = res.memberActiveTrend;
-				line3.setOption(lineChartOptions1(memberActiveTrend.timeList, memberActiveTrend.teamList, memberActiveTrend.personageList,40)); //用户活跃量趋势
+				line3.setOption(lineChartOptions1(memberActiveTrend.timeList, memberActiveTrend.teamList, memberActiveTrend.personageList, 40)); //用户活跃量趋势
 			}
 		})
 	}
@@ -427,7 +428,7 @@ $(function() {
 			type: "post",
 			dataType: "json",
 			data: {},
-			success: function(res) {
+			success: function (res) {
 				//公交车辆平均充电时长AverageTimeForGong
 				//其他车辆平均充电时长AverageTimeForOther
 				var AverageTimeForGong = res.AverageTimeForGong;
@@ -438,9 +439,9 @@ $(function() {
 				var anotherPercent = res.anotherPercent; //服务运营下其他百分比
 				$('.gongPercent').text(gongPercent + '%');
 				$('.anotherPercent').text(anotherPercent + '%');
-				var gongPercentceil=Math.ceil(gongPercent);
+				var gongPercentceil = Math.ceil(gongPercent);
 				$('#gongPercentBar').attr("aria-valuenow", gongPercentceil);
-				
+
 				var totalChargingTime = parseFloat(res.totalChargingTime); //累计服务时长 总时长 
 				var gongChargingTime = parseFloat(res.gongChargingTime); //累计服务时长 公交总时长 
 				var otherChargingTime = parseFloat(res.otherChargingTime); //累计服务时长 其他总时长 
@@ -456,8 +457,8 @@ $(function() {
 
 				$('.totalChargingTime').lemCounter({
 					value_to: totalChargingTime,
-					value_from:totalChargingTime_f
-				});	
+					value_from: totalChargingTime_f
+				});
 				totalChargingTime_f = totalChargingTime;
 
 				if (Math.abs(gongChargingTime) > 10000) {
@@ -472,8 +473,8 @@ $(function() {
 
 				$('.gongChargingTime').lemCounter({
 					value_to: gongChargingTime,
-					value_from:gongChargingTime_f
-				});	
+					value_from: gongChargingTime_f
+				});
 				gongChargingTime_f = gongChargingTime;
 
 				if (Math.abs(otherChargingTime) > 10000) {
@@ -492,8 +493,8 @@ $(function() {
 
 				$('.otherChargingTime').lemCounter({
 					value_to: otherChargingTime,
-					value_from:otherChargingTime_f
-				});	
+					value_from: otherChargingTime_f
+				});
 				otherChargingTime_f = otherChargingTime;
 			}
 		})

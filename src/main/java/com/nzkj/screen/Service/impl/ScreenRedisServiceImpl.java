@@ -2,20 +2,15 @@ package com.nzkj.screen.Service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.nzkj.screen.Entity.*;
 import com.nzkj.screen.Entity.DTO.*;
-import com.nzkj.screen.Entity.Station;
-import com.nzkj.screen.Entity.StationShowDay;
-import com.nzkj.screen.Entity.StationShowTotal;
 import com.nzkj.screen.Service.ScreenRedisService;
 import com.nzkj.screen.Service.StationService;
-import com.nzkj.screen.Utils.ParseUtils;
-import com.nzkj.screen.Utils.RedisCacheUtil;
-import com.nzkj.screen.Utils.TimeUtils;
-import com.nzkj.screen.Utils.ValUtil;
+import com.nzkj.screen.Utils.*;
 import com.nzkj.screen.mapper.pile.config.IPileMapper;
 import com.nzkj.screen.mapper.pile.config.IStationMapper;
-import com.nzkj.screen.mapper.pile.screen.IStationShowDayMapper;
-import com.nzkj.screen.mapper.pile.screen.IStationShowTotalMapper;
+import com.nzkj.screen.mapper.pile.member.IMemberMapper;
+import com.nzkj.screen.mapper.pile.screen.*;
 import com.nzkj.screen.memory.IMemoryData;
 import com.nzkj.screen.memory.LocalMemoryData;
 import com.xiaoleilu.hutool.util.CollectionUtil;
@@ -28,7 +23,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -63,6 +61,21 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
 
     @Autowired
     private IMemoryData memoryData;
+
+    @Autowired
+    private ITotalOperateMapper totalOperateMapper;
+
+    @Autowired
+    private IAllMonthDataMapper allMonthDataMapper;
+
+    @Autowired
+    private IStationShowMonthMapper stationShowMonthMapper;
+
+    @Autowired
+    private IStationShowMonthMemberMapper stationShowMonthMemberMapper;
+
+    @Autowired
+    private IMemberMapper memberMapper;
 
     //商家id为固定值
     @Value("${sellerId}")
@@ -106,41 +119,42 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
             if (CollectionUtil.isNotEmpty(guns)) {
                 for (GunMonitorDto gunMonitorDto : guns) {
                     gunCount++;
+                    // GunStateEnum 类型对应数字请查找这个枚举
                     // 充电枪信息统计
-//                    switch (gunMonitorDto.getGunState()) {
-//                        case CHARGING:
-//                            // 充电中的电枪
-//                            charging++;
-//                            break;
-//
-//                        case FREE:
-//                            // 空闲中的电枪
-//                            free++;
-//                            break;
-//
-//                        case CHARGEFINISH:
-//                            // 已充满的枪
-//                            chargeFinsh++;
-//                            break;
-//                        case OFFLINE:
-//                            // 离线中的电枪
-//                            offLine++;
-//                            break;
-//                        case CHARGEPREPARE:
-//                            // 充电准备中的电枪
-//                            chargePrepare++;
-//                            break;
-//                        case BESPEAK:
-//                            // 预约的电枪
-//                            bespeak++;
-//                            break;
-//                        case Problem:
-//                            // 告警中的电枪
-//                            problem++;
-//                            break;
-//                        default:
-//                            break;
-//                    }
+                    switch (gunMonitorDto.getGunState()) {
+                        case 3:
+                            // 充电中的电枪
+                            charging++;
+                            break;
+
+                        case 1:
+                            // 空闲中的电枪
+                            free++;
+                            break;
+
+                        case 4:
+                            // 已充满的枪
+                            chargeFinsh++;
+                            break;
+                        case 5:
+                            // 离线中的电枪
+                            offLine++;
+                            break;
+                        case 2:
+                            // 充电准备中的电枪
+                            chargePrepare++;
+                            break;
+                        case 8:
+                            // 预约的电枪
+                            bespeak++;
+                            break;
+                        case 7:
+                            // 告警中的电枪
+                            problem++;
+                            break;
+                        default:
+                            break;
+                    }
 
                 }
             }
@@ -344,73 +358,456 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
     @Override
     public Map<String, Object> doGetStationEquipmentInfo(Long stationID) {
         Map<String, Object> result = new ConcurrentHashMap<>();
-        List<PileDto> pileByStationID = memoryData.getPileByStation(stationID);
-        Double allPower = 0.00;// 设备总功率
-        for (PileDto pile : pileByStationID) {
-            if (pile.getPileTypeDto().getPower() != null) {
-                Double power = Double.valueOf(pile.getPileTypeDto().getPower());
-                allPower += power;
-            }
-        }
-        result.put("totalPowerOfEquipment", allPower);
-
-//        Integer transformerPower = 0;// 变压功率
-//        TransformerDto transformerDto = new TransformerDto();
-//        transformerDto.setStationId(stationID);
-//        List<TransformerDto> list = transformerManager.getList(transformerDto);
-//        for (TransformerDto transformer : list) {
-//            transformerPower += transformer.getPowerRate();
+//        List<PileDto> pileByStationID = memoryData.getPileByStation(stationID);
+//        Double allPower = 0.00;// 设备总功率
+//        for (PileDto pile : pileByStationID) {
+//            if (pile.getPileTypeDto().getPower() != null) {
+//                Double power = Double.valueOf(pile.getPileTypeDto().getPower());
+//                allPower += power;
+//            }
 //        }
-//        result.put("variableVoltagePower", transformerPower);
-        new ParseUtils();
-        // 充电站点电能
-//        StationShowTotal t = stationShowTotalRepository.getByL_station_id(stationID);
-        StationShowTotal t = stationShowTotalMapper.get(stationID);
+//        new ParseUtils();
 
-        result.put("chargingEnergy", ParseUtils.whParseKwh(t.getTotalStationIPowerCount().longValue()));
+        StationShowTotal t = stationShowTotalMapper.get(stationID,sellerId);
+
+        result.put("variableVoltagePower", 0);
+        result.put("totalPowerOfEquipment", t.getTotalStationIPowerCount());
+        result.put("chargingEnergy", ParseUtils.whParseKwh(t.getTotalStationChangePowerCount().longValue()));
 
         return result;
     }
 
     @Override
     public JSONArray getStationInServiceMapData() {
-        //        JSONArray resultJson = new JSONArray();
-//
-//        //从redis里取 这个商家下所有站点信息  或者从数据库取并存入redis
-//        JSONArray stationBySeller = getStationInfo();
-//
-//
-//        if(CollectionUtils.isEmpty(stationBySeller))return resultJson;
-//        JSONObject stationJson = null;
-//        List<GunMonitorDto> gunByStation = null;
-//        Set<String> memberNoSet = null;
+
         JSONArray resultJson = new JSONArray();
         List<StationDto> stationBySeller = memoryData.getStationBySeller(sellerId);
         if(CollectionUtil.isEmpty(stationBySeller))return resultJson;
         JSONObject stationJson = null;
         List<GunMonitorDto> gunByStation = null;
         Set<String> memberNoSet = null;
-        for(Object o : stationBySeller) {
-            JSONObject station = (JSONObject) o;
+        for(StationDto station : stationBySeller) {
             memberNoSet = new HashSet<>();
-            gunByStation = stationService.getGunByStation(station.getLong("stationId"));
+            gunByStation = memoryData.getGunByStation(station.getId());
             if(!org.springframework.util.CollectionUtils.isEmpty(gunByStation)) {
                 int inServiceUsers = 0;
                 for(GunMonitorDto gun : gunByStation) {
-                    if(gun.getGunState() == 3 && com.nzkj.screen.Utils.StringUtils.isNotEmpty(gun.getMemberNo()))memberNoSet.add(gun.getMemberNo());
-                    else if(gun.getGunState() == 3)inServiceUsers++;
+                    if(gun.getRealGunState() == 3 && StringUtils.isNotBlank(gun.getMemberNo()))memberNoSet.add(gun.getMemberNo());
+                    else if(gun.getRealGunState() == 3)inServiceUsers++;
                 }
                 stationJson = new JSONObject();
-                stationJson.put("stationId", station.get("stationId"));
-                stationJson.put("stationName", station.get("stationName"));
+                stationJson.put("stationId", station.getId());
+                stationJson.put("stationName", station.getName());
                 stationJson.put("stationInServiceUserCount", memberNoSet.size()+inServiceUsers);
-                stationJson.put("lng", station.get("lng"));
-                stationJson.put("lat", station.get("lat"));
+                stationJson.put("lng", station.getLongitude());
+                stationJson.put("lat", station.getLatitude());
                 resultJson.add(stationJson);
             }
         }
         return resultJson;
     }
+
+    @Override
+    public List<StationDto> getStationDto() {
+        return stationMapper.getStationDtoListBySellerId(sellerId);
+    }
+
+    @Override
+    public Map<String, Object> doHistoryTotalCharging() {
+        Map<String, Object> map = new ConcurrentHashMap<String, Object>();
+
+        //公交车辆充电占其他车辆充电的占比值--carChargingPercent
+        Map<String,Object> sumRate = getSumPowerAndRate();
+        double percent=(double) sumRate.get("rate");
+        map.put("carChargingPercent", percent);
+
+        //累计充电量的历史总的充电量sumPower千瓦
+        long sumPower=(long) sumRate.get("sumPower");
+        map.put("sumPower", TypeRotationUtil.stringTurnKw2(sumPower));
+
+        //显示近12个月公交车辆和其他车辆充电的每月充电量---team12ChargingData
+        List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
+        Map<String, Object> teamAndPersonChargePower = getTeamAndPersonChargePower();
+        List timeList=(List) teamAndPersonChargePower.get("timeList");
+        List personPowerList=(List) teamAndPersonChargePower.get("personPowerList");
+        List teamPowerList=(List) teamAndPersonChargePower.get("teamPowerList");
+        Map<String, Object> dataMap = null;
+        for (int i = 0; i < timeList.size(); i++){
+            dataMap = new HashMap<String, Object>();
+            dataMap.put("data", timeList.get(i));
+            dataMap.put("公交车", TypeRotationUtil.stringTurnKw2((Long)teamPowerList.get(i)));
+            dataMap.put("其他", TypeRotationUtil.stringTurnKw2((Long)personPowerList.get(i)));
+            data.add(dataMap);
+        }
+        map.put("team12ChargingData", data);
+
+        return map;
+    }
+
+    @Override
+    public List<Map<String, Object>> doGetUserServiceNum(Long stationID) {
+        List<Map<String, Object>> userServiceNum = new ArrayList<>();
+
+        //根据站点Id统计总共服务用户分级数量和占比
+        StationShowTotal data = stationShowTotalMapper.get(stationID,sellerId);
+
+        //1、获取站点服务个人用户总数
+        BigInteger totalNum = ValUtil.valN(data.getTotalStationServiceUseCount());
+
+        //2、获取站点服务个人银卡用户总数
+        BigInteger silverUseCount = ValUtil.valN(data.getTotalStationServiceSilverUseCount());
+        double resSilverUseCountRate = 0D;
+        Map map =  new HashMap();
+        if(!BigInteger.ZERO.equals(silverUseCount)){
+            resSilverUseCountRate =  silverUseCount.divide(totalNum).doubleValue();
+        }
+        map.put("memNums",silverUseCount.intValue());
+        map.put("grade",0);
+        map.put("proportion", resSilverUseCountRate);
+        userServiceNum.add(map);
+
+        //3、获取站点服务个人金卡用户总数
+        BigInteger serviceGoldUseCount = ValUtil.valN(data.getTotalStationServiceGoldUseCount());
+        double serviceGoldUseCountRate = 0D;
+        Map goldUseCountMap =  new HashMap();
+        if(!BigInteger.ZERO.equals(serviceGoldUseCount)){
+            serviceGoldUseCountRate =  serviceGoldUseCount.divide(totalNum).doubleValue();
+        }
+        goldUseCountMap.put("memNums",serviceGoldUseCount);
+        goldUseCountMap.put("grade",1);
+        goldUseCountMap.put("proportion", serviceGoldUseCountRate);
+        userServiceNum.add(goldUseCountMap);
+
+        //4、获取站点服务个人白金卡用户总数
+        BigInteger platinumUseCount = ValUtil.valN(data.getTotalStationServicePlatinumUseCount());
+        double platinumUseCountRate = 0D;
+        Map platinumUseMap =  new HashMap();
+        if(!BigInteger.ZERO.equals(platinumUseCount)){
+            platinumUseCountRate =  platinumUseCount.divide(totalNum).doubleValue();
+        }
+        platinumUseMap.put("memNums",platinumUseCount);
+        platinumUseMap.put("grade",2);
+        platinumUseMap.put("proportion", platinumUseCountRate);
+        userServiceNum.add(platinumUseMap);
+
+        //5、站点服务个人钻石卡用户总数
+        BigInteger diamondCount = ValUtil.valN(data.getTotalStationServiceDiamondUseCount());
+        double diamondRate = 0D;
+        Map diamondMap =  new HashMap();
+        if(!BigInteger.ZERO.equals(platinumUseCount)){
+            diamondRate =  platinumUseCount.divide(totalNum).doubleValue();
+        }
+        diamondMap.put("memNums",diamondCount);
+        diamondMap.put("grade",3);
+        diamondMap.put("proportion", diamondRate);
+        userServiceNum.add(diamondMap);
+
+        //6、获取站点服务个人黑金卡用户总数
+        BigInteger blackgoldCount = ValUtil.valN(data.getTotalStationServiceBlackgoldUseCount());
+        double blackgoldRate = 0D;
+        Map blackgoldMap =  new HashMap();
+        if(!BigInteger.ZERO.equals(platinumUseCount)){
+            blackgoldRate =  platinumUseCount.divide(totalNum).doubleValue();
+        }
+        blackgoldMap.put("memNums",blackgoldCount);
+        blackgoldMap.put("grade",4);
+        blackgoldMap.put("proportion", blackgoldRate);
+        userServiceNum.add(blackgoldMap);
+
+
+        return userServiceNum;
+    }
+
+    @Override
+    public Map<String, Object> doGetStationMemData(Long stationID) {
+        String date = TimeUtils.format(new Date(),"yyyy-MM");
+        DecimalFormat format = new DecimalFormat("0.00");
+        StationShowMonth data = stationShowMonthMapper.get(stationID,sellerId,date);
+        Map<String,Object> map = new HashMap<>();
+
+        //1、获取站点服务用户总数 = month_pile_personal_num_count 月个人会员订单总数
+        map.put("allservice",ValUtil.toLong(data.getMonthPilePersonalNumCount(),0L));
+
+        //2、获取人均充电消费(分) = 站点个人用户累计充电消费总金额÷站点个人用户累计消费订单总数=人均充电消费（元/次）*********************       待确定 ******************
+        //2.1、站点个人用户累计充电消费总金额
+        BigInteger powerBalanceCount = ValUtil.valN(stationShowTotalMapper.getUserTotalCharge(stationID,sellerId));
+        //2.2、站点个人用户累计消费订单总数
+        BigInteger orderNumber = ValUtil.valN(stationShowMonthMapper.getUserCumulativeOrderNumber(stationID,sellerId));
+
+        if(BigInteger.ZERO.equals(orderNumber)){
+            map.put("perCapitaCharging",0) ;
+        }else{
+            map.put("perCapitaCharging",powerBalanceCount.divide(orderNumber).longValue());
+        }
+        //3、获取月充电预约数 = 当月个人会员在该场站预约充电成功的用户数量
+        map.put("monthAppointment",ValUtil.toLong(data.getMonthPersonalBookedNum(),0L));
+
+        //4、获取月活动参与数 =  显示个人会员当月在该站点享受过充电折扣、抵扣或其他优惠的订单数
+        map.put("monthEvent",ValUtil.toLong(data.getMonthPersonalVisitNum(),0L));
+
+
+
+        String moreThan5FansRateKey = "moreThan5FansRate-"+stationID+"-"+sellerId+"-"+date;
+        if(redisCache.get(moreThan5FansRateKey) == null){
+            // 这两个数值查询起来对mysql消耗较大 所以交给redis  降低查询频次
+            //5、获取总用户
+            double totalFans = stationShowMonthMemberMapper.getTotalFansData(stationID,sellerId,date).doubleValue();
+            //6、获取忠实粉丝充电次数大于等于5次以上的
+            double stationMemData = stationShowMonthMemberMapper.getThanFiveFansData(stationID,sellerId,date).doubleValue();
+            map.put("fans",0F);
+            if( totalFans != 0 ){
+                double fansRate = ValUtil.div(stationMemData*100,totalFans,2);
+                map.put("fans",fansRate);
+                redisCache.put(moreThan5FansRateKey,fansRate);
+            }
+        }else{
+            map.put("fans",Double.valueOf(redisCache.get(moreThan5FansRateKey)));
+        }
+
+
+        //7、获取月均人均充电(次) = 个人会员当月在该场站充电订单总数÷在该场站月充电会员数
+        //个人会员当月在该场站充电订单总数
+        StationShowMonth res = stationShowMonthMapper.get(stationID,sellerId,date);
+        map.put("chargingConsumption",0L);
+        if( res != null ){
+            double toTalOrderCount = res.getMonthPilePersonalNumCount().doubleValue();
+            double memberCount = res.getMonthChargePersonalNumCount().doubleValue();
+            map.put("chargingConsumption",ValUtil.div(toTalOrderCount,memberCount,2));
+        }
+        return map;
+    }
+
+    @Override
+    public List<Map<String, Object>> getMemberAddByMonth(Long stationID) {
+        //初始化日期集合
+        List<String> nowOfTwelveMonth = TimeUtils.getNowOfTwelveMonth();
+        //返回数据集
+        List<Map<String, Object>> list = new ArrayList<>();
+        //1、开始遍历用户增长数量集
+        for (int i = nowOfTwelveMonth.size() - 1; i >= 0; i--) {
+            Map<String,Object> map = new HashMap<>();
+            String time = nowOfTwelveMonth.get(i);
+            StationShowMonth data = stationShowMonthMapper.get(stationID,sellerId,time);
+            if(data != null){
+                map.put("time",time);
+                map.put("memberNum", ValUtil.valN(data.getMonthGrouthPersonalNum()));
+                list.add(map);
+            }else{
+                map.put("time",time);
+                map.put("memberNum",0);
+                list.add(map);
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> getMemberByHours(Long stationId) {
+        Date date = new Date();
+        String startTime = (TimeUtils.formatFullTime(TimeUtils.getStartDate(date))).substring(0,7);
+        StationShowMonth s = stationShowMonthMapper.get(stationId,sellerId,startTime);
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        if(s == null){
+            for(int j = 0;j <24;j++){
+                Map<String,Object> map = new HashMap<>();
+                map.put("charingNum",0);
+                if( j == 0 ){
+                    map.put("time",24);
+                }else{
+                    map.put("time", j);
+                }
+                map.put("time",j);
+                mapList.add(map);
+            }
+            return mapList;
+        }
+
+        JSONArray data = new JSONArray();
+        data.add(s.getMonthHourZeroChargeCount());
+        data.add(s.getMonthHourOneChargeCount());
+        data.add(s.getMonthHourTwoChargeCount());
+        data.add(s.getMonthHourThreeChargeCount());
+        data.add(s.getMonthHourFourChargeCount());
+        data.add(s.getMonthHourFiveChargeCount());
+        data.add(s.getMonthHourSixChargeCount());
+        data.add(s.getMonthHourSevenChargeCount());
+        data.add(s.getMonthHourEightChargeCount());
+        data.add(s.getMonthHourNineChargeCount());
+        data.add(s.getMonthHourTenChargeCount());
+        data.add(s.getMonthHourElevenChargeCount());
+        data.add(s.getMonthHourTwelveChargeCount());
+        data.add(s.getMonthHourThirteenChargeCount());
+        data.add(s.getMonthHourFourteenChargeCount());
+        data.add(s.getMonthHourFifteenChargeCount());
+        data.add(s.getMonthHourSixteenChargeCount());
+        data.add(s.getMonthHourSeventeenChargeCount());
+        data.add(s.getMonthHourEighteenChargeCount());
+        data.add(s.getMonthHourNineteenChargeCount());
+        data.add(s.getMonthHourTwentyChargeCount());
+        data.add(s.getMonthHourTwentyOneChargeCount());
+        data.add(s.getMonthHourTwentyTwoChargeCount());
+        data.add(s.getMonthHourTwentyThreeChargeCount());
+
+
+        for(int i=0;i < data.size(); i++){
+            Map<String,Object> map = new HashMap<>();
+            if(i == 0 ){
+                map.put("time",24);
+            }else{
+                map.put("time",i);
+            }
+            BigInteger val = ValUtil.toBigInteger(data.get(i));
+            map.put("charingNum", val.intValue());
+            mapList.add(map);
+        }
+
+        return mapList;
+    }
+
+    /**
+     * @Title
+     * @Description：根据站点id显示当月在该场站重复充电大于等于20次、10次、5次的个人会员数量占比
+     * @Param：stationId 站点id sellerId 商户id
+     * @Return：Map<String, Object>  小于5次  大于5次 大于10次 大于20次
+     */
+    @Override
+    public Map<String, Object> getFansProportion(Long stationId) {
+        Date date = new Date();
+        String startTime = (TimeUtils.formatFullTime(TimeUtils.getStartDate(date))).substring(0,7);
+        Map<String,Object> map = new HashMap<>();
+
+        StationShowMonth s = stationShowMonthMapper.get(stationId,sellerId,startTime);
+        double sum = 0;
+        if(s != null){
+            sum = s.getMonthChargePersonalNumCount().doubleValue();
+        }else{
+            map.put("oneToFive", 0);
+            map.put("fiveToTen", 0);
+            map.put("tenToTwenty", 0);
+            map.put("twentyTo", 0);
+            return map;
+        }
+
+        //小于5次
+        double oneToFive = stationShowMonthMemberMapper.getLessFiveRate(stationId,sellerId,startTime).doubleValue();
+        map.put("oneToFive", ValUtil.div(oneToFive,sum,2)*100);
+
+
+        //大于5次
+        double thanFive = stationShowMonthMemberMapper.getThanFiveRate(stationId,sellerId,startTime).doubleValue();
+        map.put("fiveToTen", ValUtil.div(thanFive,sum,2)*100);
+
+        //大于10次
+        double thanTen = stationShowMonthMemberMapper.getThanTenRate(stationId,sellerId,startTime).doubleValue();
+        map.put("tenToTwenty", ValUtil.div(thanTen,sum,2)*100);
+
+        //大于20次
+        double thanTwenty = stationShowMonthMemberMapper.getThanTwentyRate(stationId,sellerId,startTime).doubleValue();
+        map.put("twentyTo", ValUtil.div(thanTwenty,sum,2)*100);
+
+        return map;
+    }
+
+    /**
+     * @Title
+     * @Description：根据站点id显示当月在该场站充电消费排名前8 的个人会员用户
+     * @Param： tationId 站点id sellerId 商户id
+     * @Return：Lis</map> key : image(用户头像) name(用户名称) charingNum(充电次数) allbalance(消费总金额(分))
+     */
+    @Override
+    public List<Map<String, Object>> getConsumptionRanking(Long stationId) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(cal.MONTH, -1);
+        SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM");
+        String startTime = dft.format(cal.getTime());
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        List<StationShowMonthMemberDTO> members = stationShowMonthMemberMapper.getStationConsumptionRanking(stationId,sellerId,startTime);
+        if(members == null){
+            Map<String,Object> map = new HashMap<>();
+            map.put("charingNum",0);
+            map.put("allbalance",0L);
+            map.put("name", null);
+            map.put("image",null);
+            mapList.add(map);
+            return mapList;
+        }
+        for(StationShowMonthMemberDTO s : members){
+            Map<String,Object> map = new HashMap<>();
+            Member m = memberMapper.get(s.getLMemberId());
+            map.put("image",m.getIcon());
+
+            //String newname = CodeUtil.decodeUTF8(name);
+            map.put("name",m.getName());
+
+            map.put("charingNum",s.getMonthMemberChargeCount());
+            map.put("allbalance",s.getMonthTeamBalanceCount());
+            mapList.add(map);
+        }
+        return mapList;
+    }
+
+    private Map<String, Object> getTeamAndPersonChargePower(){
+        Map<String, Object> mapData = new HashMap<>();
+        //日期集合
+        List<String> timeList = new ArrayList<>();
+        for (int i = 11; i >= 0; i--) {
+            String time = TimeUtils.format(TimeUtils.addMonth(new Date(), -i), "yyyy-MM");
+            timeList.add(time);
+        }
+        List<Long> personPowerList = new ArrayList<>();
+        List<Long> teamPowerList = new ArrayList<>();
+        //1、开始遍历数据集
+        for (String date : timeList) {
+            AllMonthData a = allMonthDataMapper.get(sellerId,date);
+            if(a != null){
+                if(a.getMonthTeamChargingPower() != null){
+                    teamPowerList.add(a.getMonthTeamChargingPower().longValue());
+                }else{
+                    teamPowerList.add(0l);
+                }
+                if(a.getMonthPersonalChargingPower() != null){
+                    personPowerList.add(a.getMonthPersonalChargingPower().longValue());
+                }else {
+                    personPowerList.add(0L);
+                }
+
+            } else{
+                teamPowerList.add(0l);
+                personPowerList.add(0L);
+            }
+        }
+        mapData.put("timeList", timeList);
+        mapData.put("personPowerList", personPowerList);
+        mapData.put("teamPowerList", teamPowerList);
+        return mapData;
+
+    }
+
+    private Map<String,Object> getSumPowerAndRate(){
+        Map<String, Object> mapDatas = new HashMap<>();
+        long sumPower = 0L;
+        long temPower = 0L;
+        double rate = 0;
+
+        try {
+            sumPower = totalOperateMapper.get(sellerId).getTotalChargingPower().longValue();
+            temPower = totalOperateMapper.get(sellerId).getTeamChargingPower().longValue();
+
+            if(sumPower != 0){
+                rate = BigDecimal.valueOf(temPower*100).divide(BigDecimal.valueOf(sumPower), 2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            }
+            mapDatas.put("sumPower", sumPower);
+            mapDatas.put("rate", rate);
+        }catch (Exception e){
+            e.printStackTrace();
+            mapDatas.put("sumPower", sumPower);
+            mapDatas.put("rate", rate);
+            return mapDatas;
+        }
+        return mapDatas;
+    }
+
 
     private Map<String, Object> getStationData(Long stationId,Long sellerId){
         StationInfoDTO stationData = stationMapper.getStationDatanum(stationId,sellerId);
@@ -450,176 +847,99 @@ public class ScreenRedisServiceImpl implements ScreenRedisService {
 
         // station_show_total_table redis-key：STT_站点ID_商家号_查询的字段名   总表
         String date = TimeUtils.format(new Date(), "yyyy-MM-dd");
-        String totalServicesKey = String.format("STT_%s_%s_%s", stationId,  sellerId, "total_station_service_count");//站点总服务次数
-        String stationCountKey = String.format("STT_%s_%s_%s", stationId, sellerId, "total_station_power_count");//站点总充电量
-        String totalBlanceKey = String.format("STT_%s_%s_%s", stationId, sellerId, "total_station_money_count");//站点总收入
-        String stationJianPowerCountKey = String.format("STT_%s_%s_%s", stationId, sellerId, "total_station_jian_power_count");//站点尖总充电量
-        String statiFengPowerCountKey = String.format("STT_%s_%s_%s", stationId, sellerId, "total_station_feng_power_count");//站点峰总充电量
-        String statiPingPowerCountKey = String.format("STT_%s_%s_%s", stationId, sellerId, "total_station_ping_power_count");//站点平总充电量
-        String statiGuPowerCountKey = String.format("STT_%s_%s_%s", stationId, sellerId, "total_station_gu_power_count");//站点谷总充电量
 
+        StationShowTotal totalData = stationShowTotalMapper.getBySeller(stationId,sellerId);
 
-        StationShowTotal totalData = new StationShowTotal();
-        StationShowDay dayData = new StationShowDay();
-        if(redisCache.get(totalServicesKey) == null || redisCache.get(stationCountKey) == null || redisCache.get(totalBlanceKey) == null || redisCache.get(stationJianPowerCountKey) == null
-                ||  redisCache.get(statiFengPowerCountKey) == null || redisCache.get(statiPingPowerCountKey) == null || redisCache.get(statiGuPowerCountKey) == null){
-            //站点总服务次数，总电量，总收入，充电峰谷
-//            totalData = stationShowTotalRepository.getStationBalanceInfoByStationId(sellerId,stationId);
-            totalData = stationShowTotalMapper.getBySeller(stationId,sellerId);
-        }
 
 
         Map<String,Object> map = new HashMap<>();
 
         //1、总服务次数
-        //如果redis有数据直接获取
-        if( redisCache.get(totalServicesKey ) == null){
-            //1.1如果如果数据库中存在
             if( totalData != null ){
                 map.put("servicesNums", ValUtil.toLong(totalData.getTotalStationServiceCount(),0L));
-                redisCache.put(totalServicesKey,totalData.getTotalStationServiceCount());
             }else{
                 //1.2如果如果数据库中不存在
                 map.put("servicesNums", 0L);
             }
-        }else {
-            map.put("servicesNums", ValUtil.toLong(redisCache.get(totalServicesKey),0L));
-        }
+
         //2、总电量
-        if( redisCache.get(stationCountKey) == null){
-            //2.1如果如果数据库中存在
+
             if( totalData != null ){
                 map.put("totalPower", ValUtil.toLong(totalData.getTotalStationPowerCount(),0L));
-                redisCache.put(stationCountKey,totalData.getTotalStationPowerCount());
             }else{
                 //2.2如果如果数据库中不存在
                 map.put("totalPower", 0L);
             }
-        }else {
-            map.put("totalPower", ValUtil.toLong(redisCache.get(stationCountKey),0L));
-        }
+
         //3、总收入
-        if( redisCache.get(totalBlanceKey ) == null){
-            //3.1如果如果数据库中存在
             if( totalData != null ){
                 map.put("totalRevenue", ValUtil.toLong(totalData.getTotalStationMoneyCount(),0L));
-                redisCache.put(totalBlanceKey,totalData.getTotalStationMoneyCount());
             }else{
                 //3.2如果如果数据库中不存在
                 map.put("totalRevenue", 0L);
             }
-        }else {
-            map.put("totalRevenue", ValUtil.toLong(redisCache.get(totalBlanceKey),0L));
-        }
 
 
 
         //4、充电尖总充电量
-        if( redisCache.get(stationJianPowerCountKey ) == null){
-            //4.1如果如果数据库中存在
             if( totalData != null ){
-
                 map.put("jianCharge", ValUtil.toLong(totalData.getTotalStationJianPowerCount(),0L));
-                redisCache.put(stationJianPowerCountKey,totalData.getTotalStationJianPowerCount());
             }else{
                 //4.2如果如果数据库中不存在
                 map.put("jianCharge", 0L);
             }
-        }else {
-            map.put("jianCharge", ValUtil.toLong(redisCache.get(stationJianPowerCountKey),0L));
-        }
 
         //5、充电峰总充电量
-        if( redisCache.get(statiFengPowerCountKey ) == null){
-            //5.1如果如果数据库中存在
             if( totalData != null ){
                 map.put("fengCharge", ValUtil.toLong(totalData.getTotalStationFengPowerCount(),0L));
-                redisCache.put(statiFengPowerCountKey,totalData.getTotalStationFengPowerCount());
             }else{
-                //5.2如果如果数据库中不存在
                 map.put("fengCharge", 0L);
             }
-        }else {
-            map.put("fengCharge", ValUtil.toLong(redisCache.get(statiFengPowerCountKey),0L));
-        }
+
 
         //6、充电平总充电量
-        if( redisCache.get(statiPingPowerCountKey ) == null){
-            //6.1如果如果数据库中存在
             if( totalData != null ){
                 map.put("pingCharge", ValUtil.toLong(totalData.getTotalStationPingPowerCount(),0L));
-                redisCache.put(statiPingPowerCountKey,totalData.getTotalStationPingPowerCount());
             }else{
                 //6.2如果如果数据库中不存在
                 map.put("pingCharge", 0L);
             }
-        }else {
-            map.put("pingCharge", ValUtil.toLong(redisCache.get(statiPingPowerCountKey),0L));
-        }
+
         //7、充电谷总充电量
-        if( redisCache.get(statiGuPowerCountKey ) == null){
-            //7.1如果如果数据库中存在
             if( totalData != null ){
                 map.put("guCharge", ValUtil.toLong(totalData.getTotalStationGuPowerCount(),0L));
-                redisCache.put(statiGuPowerCountKey,totalData.getTotalStationGuPowerCount());
             }else{
                 //7.2如果如果数据库中不存在
                 map.put("guCharge", 0L);
             }
-        }else {
-            map.put("guCharge", ValUtil.toLong(redisCache.get(statiGuPowerCountKey),0L));
-        }
 
-        // station_show_day_table redis key：→ redis-key： redis-key：SDT_站点ID_商家号_日期(yyyy-MM-dd)_查询的字段名   日表
-        String dayTotalServicesKey = String.format("SDT_%s_%s_%s_%s", stationId,  sellerId, date,  "day_station_pile_count");//站点天总服务次数
-        String dayTstationCountKey = String.format("SDT_%s_%s_%s_%s", stationId, sellerId, date, "day_station_power_count");//站点天总充电量
-        String dayTtotalBlanceKey = String.format("SDT_%s_%s_%s_%s", stationId, sellerId, date, "day_station_balance_count");//站点天总收入
-        if(redisCache.get(dayTotalServicesKey) == null || redisCache.get(dayTstationCountKey) == null || redisCache.get(dayTtotalBlanceKey) == null){
-            //站点今日总服务次数， 总电量，总收入统计
-//            dayData = stationShowDayRepository.getDayMemberInfo( stationId, sellerId, date);
-            dayData = stationShowDayMapper.get(stationId,sellerId,date);
-        }
+        StationShowDay dayData = stationShowDayMapper.get(stationId,sellerId,date);
 
 
         //8、今日服务次数
-        if( redisCache.get(dayTotalServicesKey ) == null){
-            //8.1如果如果数据库中存在
             if( dayData != null ){
                 map.put("todayServicesNums", ValUtil.toLong(dayData.getDayStationPileCount(),0L));
-                redisCache.put(dayTotalServicesKey,dayData.getDayStationPileCount());
             }else{
                 //8.2如果如果数据库中不存在
                 map.put("todayServicesNums", 0L);
             }
-        }else {
-            map.put("todayServicesNums", ValUtil.toLong(redisCache.get(dayTotalServicesKey),0L));
-        }
+
         //9、今日总电量
-        if( redisCache.get(dayTstationCountKey ) == null){
-            //9.1如果如果数据库中存在
             if( dayData != null ){
                 map.put("todayTotalPower", ValUtil.toLong(dayData.getDayStationPowerCount(),0L));
-                redisCache.put(dayTstationCountKey,dayData.getDayStationPowerCount());
             }else{
                 //9.2如果如果数据库中不存在
                 map.put("todayTotalPower", 0L);
             }
-        }else {
-            map.put("todayTotalPower", ValUtil.toLong(redisCache.get(dayTstationCountKey),0L));
-        }
+
         //10、今日总收入统计
-        if( redisCache.get( dayTtotalBlanceKey ) == null){
-            //10.1如果如果数据库中存在
             if( dayData != null ){
                 map.put("todayTotalRevenue", ValUtil.toLong(dayData.getDayStationBalanceCount(),0L));
-                redisCache.put(dayTtotalBlanceKey,dayData.getDayStationBalanceCount());
             }else{
                 //10.2如果如果数据库中不存在
                 map.put("todayTotalRevenue", 0L);
             }
-        }else {
-            map.put("todayTotalRevenue", ValUtil.toLong(redisCache.get(dayTtotalBlanceKey),0L));
-        }
+
         return map;
     }
 

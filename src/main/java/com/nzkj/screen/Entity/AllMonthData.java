@@ -23,6 +23,12 @@ public class AllMonthData {
     //商家id
     private long lSellerId;
 
+    //月车队累计充电量
+    private BigInteger monthTeamChargingPower;
+
+    //月个人累计充电量
+    private BigInteger monthPersonalChargingPower;
+
     //月充电总收入
     private BigInteger monthIChargingActualBalance;
 

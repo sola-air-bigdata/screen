@@ -10,11 +10,16 @@ $(function () {
     // $("#btn1").click(chagePower)                    //该按钮事件可以删除
 
 })
-function GetQueryString(name) {
-				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-				var r = window.location.search.substr(1).match(reg);
-				if (r != null) return unescape(r[2]);
-				return null;}
+function GetQueryString(name) {
+
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+
+				var r = window.location.search.substr(1).match(reg);
+
+				if (r != null) return unescape(r[2]);
+
+				return null;
+}
 var stationID=GetQueryString('stationID');
 var num=1;
 
@@ -493,7 +498,7 @@ function addlogo() {
      })
  */
     var loader = new THREE.FontLoader();
-    loader.load('./animation/3djs/gentilis_regular.typeface.json', function (font) {
+    loader.load('resources/screen/expoScreen/animation/3djs/gentilis_regular.typeface.json', function (font) {
         sysfont = font;
         console.log(11)
         initdata(stationID, 1)
