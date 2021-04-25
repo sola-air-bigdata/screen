@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.nzkj.screen.Entity.DTO.StationDto;
 import io.lettuce.core.dynamic.annotation.Param;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,5 +48,14 @@ public interface ScreenRedisService {
 
     List<Map<String, Object>> getConsumptionRanking(Long stationId);
 
+    Map<String, Object> doGetTotalRechargeInfo(Long stationId);
+
+    Map<String, Object> doGetTeamMemberStageElectro(Long stationId);
+
+    List<Map<String,Object>> doGetTeamStageElectro(Long stationID);
+
+    List<Map<String,Object>> doGetTeamMemberRank(Long stationID,Integer count);
+
+    List<Map<String,Object>> doGetTeamMemberConsumeRank(Long stationID,Integer count) throws ParseException;
 
 }

@@ -154,7 +154,7 @@ public class ScreenController {
     public Map<String, Object> doGetSelloNoAndAccount() {
         Map<String, Object> result = new ConcurrentHashMap<>();
         result.put("sellerNo", sellerId);
-        result.put("account","");
+        result.put("account","20");
         return result;
     }
 

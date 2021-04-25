@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -102,23 +103,9 @@ public class ScreenViewController {
 
         Map<String, Object> map = new ConcurrentHashMap<String, Object>();
 
-        //各个数据在redis中的key
-        String totalMoneyCountKey = String.format("AT_%s_%s", sellerId, "total_i_actual_balance");
-        String totalServiceUserCountKey = String.format("AT_%s_%s", sellerId, "total_service_user_count");
-        String totalServiceCountKey = String.format("AMT_%s_%s", sellerId, "total_service_count");
+        TotalOperateData data = totalOperateMapper.get(sellerId);
 
-        Object totalMoney = redisTemplate.opsForValue().get(totalMoneyCountKey);
-        Object userCount = redisTemplate.opsForValue().get(totalServiceUserCountKey);
-        Object serviceCount = redisTemplate.opsForValue().get(totalServiceCountKey);
-
-        if (totalMoney == null || userCount == null || serviceCount == null){
-            //redis中得到的数据为null  从数据库取 再存入redis  seller_id为1是固定值
-            TotalOperateData data = totalOperateMapper.get(sellerId);
-            //存入redis
-            redisTemplate.opsForValue().set(totalMoneyCountKey,data.getTotalIActualBalance(),expireTime, TimeUnit.SECONDS);
-            redisTemplate.opsForValue().set(totalServiceUserCountKey,data.getTotalServiceUserCount(),expireTime,TimeUnit.SECONDS);
-            redisTemplate.opsForValue().set(totalServiceCountKey,data.getPersonalServiceCount(),expireTime,TimeUnit.SECONDS);
-            //数据放入返回map
+        if (data != null){
             //累计总收入totalMoney元
             map.put("totalMoney",data.getTotalIActualBalance().toString());
             //累计服务用户数totalServiceMemberNum
@@ -126,15 +113,12 @@ public class ScreenViewController {
             //累计服务次数serviceTotalCount
             map.put("serviceTotalCount",data.getPersonalServiceCount());
         }else {
-            //直接从redis取
             //累计总收入totalMoney元
-            map.put("totalMoney", totalMoney);
+            map.put("totalMoney", 0);
             //累计服务用户数totalServiceMemberNum
-//            map.put("totalServiceMemberNum", redisTemplate.opsForValue().get(totalServiceUserCountKey));
-            map.put("totalServiceMemberNum", userCount);
+            map.put("totalServiceMemberNum", 0);
             //累计服务次数serviceTotalCount
-//            map.put("serviceTotalCount",redisTemplate.opsForValue().get(totalServiceCountKey));
-            map.put("serviceTotalCount",serviceCount);
+            map.put("serviceTotalCount",0);
         }
 
         return map;
@@ -216,6 +200,46 @@ public class ScreenViewController {
     @RequestMapping(value = "/statistic/gJStationViewAjax/getConsumptionRanking.json" ,method = RequestMethod.POST)
     public List<Map<String, Object>> doGetConsumptionRanking(Long stationID){
         return screenRedisService.getConsumptionRanking(stationID);
+    }
+
+    /**
+     * 车队用户
+     */
+    @RequestMapping(value = "/statistic/screenNewAjax/getTotalRechargeInfo.json" ,method = RequestMethod.POST)
+    public Map<String, Object> doGetTotalRechargeInfo(Long stationID){
+        return screenRedisService.doGetTotalRechargeInfo(stationID);
+    }
+
+    /**
+     * 当日车队用户分析
+     */
+    @RequestMapping(value = "/statistic/screenNewAjax/getTeamMemberStageElectro.json" ,method = RequestMethod.POST)
+    public Map<String, Object> doGetTeamMemberStageElectro(Long stationID){
+        return screenRedisService.doGetTeamMemberStageElectro(stationID);
+    }
+
+    /**
+     * 车队峰平谷分析
+     */
+    @RequestMapping(value = "/statistic/screenNewAjax/getTeamStageElectro.json" ,method = RequestMethod.POST)
+    public List<Map<String,Object>> doGetTeamStageElectro(Long stationID){
+        return screenRedisService.doGetTeamStageElectro(stationID);
+    }
+
+    /**
+     * 车队单车月充电频率排名
+     */
+    @RequestMapping(value = "/statistic/screenNewAjax/getTeamMemberRank.json" ,method = RequestMethod.POST)
+    public List<Map<String,Object>> doGetTeamMemberRank(Long stationID,Integer count){
+        return screenRedisService.doGetTeamMemberRank(stationID,count);
+    }
+
+    /**
+     * 车队单车月充电频率排名
+     */
+    @RequestMapping(value = "/statistic/screenNewAjax/getTeamMemberConsumeRank.json" ,method = RequestMethod.POST)
+    public List<Map<String,Object>> doGetTeamMemberConsumeRank(Long stationID,Integer count) throws ParseException {
+        return screenRedisService.doGetTeamMemberConsumeRank(stationID,count);
     }
 
     /**

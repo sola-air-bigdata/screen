@@ -13,7 +13,7 @@ spring:
         connection-test-query: SELECT 1
         jdbcUrl: jdbc:mysql://106.55.40.222:3306/pile_member?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123qqq...A
+        password: Platform@2018
     config:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.zaxxer.hikari.HikariDataSource
@@ -27,7 +27,7 @@ spring:
         connection-test-query: SELECT 1
         jdbcUrl: jdbc:mysql://106.55.40.222:3306/pile_config?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123qqq...A
+        password: Platform@2018
     bill:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.zaxxer.hikari.HikariDataSource
@@ -41,7 +41,7 @@ spring:
         connection-test-query: SELECT 1
         jdbcUrl: jdbc:mysql://106.55.40.222:3306/pile_bill?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123qqq...A
+        password: Platform@2018
     screen:
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.zaxxer.hikari.HikariDataSource
@@ -55,7 +55,7 @@ spring:
         connection-test-query: SELECT 1
         jdbcUrl: jdbc:mysql://106.55.40.222:3306/big_screen_test?useUnicode=true&serverTimezone=UTC&useSSL=false
         username: root
-        password: 123qqq...A
+        password: Platform@2018
 
   redis:
     database: 0
