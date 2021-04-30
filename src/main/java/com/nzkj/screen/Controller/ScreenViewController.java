@@ -1147,52 +1147,35 @@ public class ScreenViewController {
         }
 
         for (String date: timeList){
-            //ADT_商家号_日期(yyyy-MM-dd)_查询的字段名
-            String temkey = String.format("ADT_%s_%s_%s", condition.getSellerId(), date, "day_team_active_count");//车队
-            String personalkey = String.format("ADT_%s_%s_%s", condition.getSellerId(), date, "day_personal_active_count");//个人
+
             condition.setStartTime(date);
-            if( redisTemplate.opsForValue().get(temkey) == null ){
-                res =  allDayMapper.getUserActivityList(sellerId,condition.getStartTime());
-                //1,2如果数据库有数据从数据库中取
-                if( res != null ){
-                    //1.2.1取出的数据存进redis
-                    redisTemplate.opsForValue().set(temkey, res.getDayTeamActiveCount(),expireTime,TimeUnit.SECONDS);
-                    Integer teamCount = ValUtil.toInteger(res.getDayTeamActiveCount(), 0);
-                    teamList.add(teamCount);
-                }
-                else {
-                    //1,.3如果redis和数据库中都不存在，对应月份的数据则返回空
-                    teamList.add(0);
-                }
+            AllDayData data = allDayMapper.get(sellerId,condition.getStartTime());
+//            res =  allDayMapper.getUserActivityList(sellerId,condition.getStartTime());
+            //1,2如果数据库有数据从数据库中取
+            if( data != null ){
+                Integer teamCount = ValUtil.toInteger(data.getDayTeamActiveCount(), 0);
+                teamList.add(teamCount);
             }
-            else{
-                //1,4如果redis中存在，直接从redis获取
-                Integer teamPower=  ValUtil.toInteger(redisTemplate.opsForValue().get(temkey), 0);
-                teamList.add(teamPower);
+            else {
+                teamList.add(0);
             }
+
 
             //1,1如果redis中不存在从数据库中取
-            if( redisTemplate.opsForValue().get(personalkey) == null ){
-                res =  allDayMapper.getUserActivityList(sellerId,condition.getStartTime());
-                //1,2如果数据库有数据从数据库中取
-                if( res != null ){
-                    //1.2.1取出的数据存进redis
 
-                    redisTemplate.opsForValue().set(personalkey,res.getDayPersonalActiveCount(),expireTime,TimeUnit.SECONDS);
-                    Integer personageCount = ValUtil.toInteger(res.getDayPersonalActiveCount(), 0);
-                    personageList.add(personageCount);
-                }
-                else {
-                    // 1,.3如果redis和数据库中都不存在，对应月份的数据则返回空
-                    personageList.add(0);
-                }
+            //1,2如果数据库有数据从数据库中取
+            if( data != null ){
+                //1.2.1取出的数据存进redis
+                Integer personageCount = ValUtil.toInteger(data.getDayPersonalActiveCount(), 0);
+                personageList.add(personageCount);
             }
-            else{
-                //1,4如果redis中存在，直接从redis获取
-                Integer otherPower =  ValUtil.toInteger(redisTemplate.opsForValue().get(personalkey), 0);
-                personageList.add(otherPower);
+            else {
+                // 1,.3如果redis和数据库中都不存在，对应月份的数据则返回空
+                personageList.add(0);
             }
         }
+
+
 
         mapData.put("timeList", timeList);
         mapData.put("personageList", personageList);
